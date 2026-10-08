@@ -9,7 +9,7 @@
   },
   "width": 700,
   "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+  "data": {"url": "../source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
   "transform": [
     {"filter": "datum.state !== 'Malaysia'"},
     {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
