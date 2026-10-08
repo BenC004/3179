@@ -1,0 +1,84 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "title": {
+    "text": {"expr": "'School Enrolment in ' + replace(selectedState, 'W.P. ', '') + ' | 2017 - 2025'"},
+    "subtitle": "Government primary and secondary schools",
+    "anchor": "start",
+    "fontSize": 22,
+    "subtitleFontSize": 14
+  },
+  "width": 700,
+  "height": 500,
+  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv","parse": {"students": "number"}}},
+  "params": [
+    {
+      "name": "selectedState",
+      "value": "Malaysia",
+      "bind": {
+        "input": "select",
+        "name": "Selected state: ",
+        "options": ["Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+                    "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor",
+                    "Terengganu", "W.P. Kuala Lumpur", "W.P. Labuan","W.P. Putrajaya"],
+        "labels": ["Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+                    "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak","Selangor",
+                    "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"]
+      }
+    }
+  ],
+  "transform": [
+    {"filter": "datum.state === selectedState"},
+    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
+    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
+    {"calculate": "toNumber(substring(datum.date, 0, 4))","as": "Year"},
+    {"filter": "datum.Year >= 2017 && datum.Year <= 2025"},
+    {"calculate": "datum.stage === 'primary' ? 'Primary' : 'Secondary'","as": "School Stage"},
+    {
+      "aggregate": [{"op": "sum","field": "students","as": "Students"}],
+      "groupby": ["state","Year","School Stage"]
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "Year", "type": "quantitative",
+      "scale": {"domain": [2017, 2025], "nice": false},
+      "axis": {"title": "Year", "format": "d",
+        "values": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+        "grid": false
+      }
+    },
+    "y": {
+      "field": "Students", "type": "quantitative",
+      "scale": {"zero": true},
+      "axis": {"title": "Students", "format": ",.0f",
+        "tickCount": 8,
+        "gridColor": "#EEEEEE"
+      }
+    },
+    "color": {
+      "field": "School Stage", "type": "nominal",
+      "scale": {"domain": ["Primary", "Secondary"], "range": ["#4E79A7", "#F28E2B"]},
+      "legend": {"title": "School stage", "orient": "right"}
+    },
+    "tooltip": [
+      {"field": "state", "type": "nominal","title": "Location"},
+      {"field": "School Stage", "type": "nominal", "title": "School stage"},
+      {"field": "Year", "type": "quantitative", "title": "Year", "format": "d"},
+      {"field": "Students", "type": "quantitative", "title": "Students", "format": ",.0f"}
+    ]
+  },
+  "layer": [
+    {"mark": {"type": "line", "strokeWidth": 3}},
+    {"mark": {"type": "point", "filled": true, "size": 35}},
+    {
+      "transform": [{"filter": "datum.Year === 2025"}],
+      "mark": {"type": "text", "align": "right", "dx": -6, "dy": -14, "fontSize": 13},
+      "encoding": {"text": {"field": "Students", "type": "quantitative", "format": ",.0f"}}
+    }
+  ],
+  "config": {
+    "font": "Arial",
+    "view": {"stroke": null},
+    "axis": {"labelFontSize": 12, "titleFontSize": 13,"domain": false,"tickColor": "#CCCCCC"}
+  }
+}
