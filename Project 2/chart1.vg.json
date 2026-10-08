@@ -77,8 +77,7 @@
     }
   ],
   "config": {
-    "font": "Arial",
-    "view": {"stroke": null},
+    "font": "Arial", "view": {"stroke": null},
     "axis": {"labelFontSize": 12, "titleFontSize": 13,"domain": false,"tickColor": "#CCCCCC"}
   }
 }
