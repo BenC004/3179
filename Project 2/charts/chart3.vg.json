@@ -1,15 +1,18 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
   "title": {
-    "text": "Which states drove Malaysia's enrolment changes?",
-    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "text": "Where did school enrolment grow or decline?",
+    "subtitle": [
+      "Government primary and secondary schools, 2017 - 2025",
+      "Colour scale capped at ±20%; hover for exact values."
+    ],
     "anchor": "start",
     "fontSize": 22,
-    "subtitleFontSize": 14
+    "subtitleFontSize": 13
   },
-  "width": 700,
+  "width": 800,
   "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+  "data": {"url": "../source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
   "transform": [
     {"filter": "datum.state !== 'Malaysia'"},
     {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
@@ -26,99 +29,118 @@
       "groupby": ["state"]
     },
     {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
-    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
+    {"calculate": "datum['Students 2017'] > 0 ? datum.Change / datum['Students 2017'] : null", "as": "Growth"},
     {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
     {
-      "window": [
-        {"op": "sum", "field": "Change", "as": "Cumulative"},
-        {"op": "row_number", "as": "Order"}
-      ],
-      "sort": [
-        {"field": "Change", "order": "descending"},
-        {"field": "state", "order": "ascending"}
-      ],
-      "frame": [null, 0]
+      "lookup": "state",
+      "from": {
+        "data": {"url": "../maps/administrative_1_state.geojson", "format": {"type": "json", "property": "features"}},
+        "key": "properties.state"
+      },
+      "as": "Boundary"
     },
-    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
     {
-      "joinaggregate": [
-        {"op": "sum", "field": "Change", "as": "National Net Change"},
-        {"op": "count", "as": "State Count"}
-      ]
+      "lookup": "state",
+      "from": {
+        "data": {
+          "values": [
+            {"state": "Perlis", "lon": 100.23, "lat": 6.50},
+            {"state": "Kedah", "lon": 100.65, "lat": 5.95},
+            {"state": "Pulau Pinang", "lon": 100.18, "lat": 5.38},
+            {"state": "Perak", "lon": 101.05, "lat": 4.65},
+            {"state": "Kelantan", "lon": 102.15, "lat": 5.35},
+            {"state": "Terengganu", "lon": 103.00, "lat": 4.85},
+            {"state": "Pahang", "lon": 102.50, "lat": 3.70},
+            {"state": "Selangor", "lon": 101.25, "lat": 3.35},
+            {"state": "Negeri Sembilan", "lon": 102.20, "lat": 2.80},
+            {"state": "Melaka", "lon": 102.30, "lat": 2.20},
+            {"state": "Johor", "lon": 103.35, "lat": 1.95},
+            {"state": "Sabah", "lon": 117.00, "lat": 5.30},
+            {"state": "Sarawak", "lon": 113.40, "lat": 2.50},
+            {"state": "W.P. Kuala Lumpur", "lon": 99.80, "lat": 3.10, "anchorLon": 101.69, "anchorLat": 3.14},
+            {"state": "W.P. Putrajaya", "lon": 100.00, "lat": 2.40, "anchorLon": 101.70, "anchorLat": 2.93},
+            {"state": "W.P. Labuan", "lon": 114.40, "lat": 5.70, "anchorLon": 115.24, "anchorLat": 5.30}
+          ]
+        },
+        "key": "state",
+        "fields": ["lon", "lat", "anchorLon", "anchorLat"]
+      }
     },
-    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
+    {
+      "calculate": "datum.state === 'W.P. Kuala Lumpur' ? 'KL: ' + format(datum.Growth, '.1%') : datum.state === 'W.P. Putrajaya' ? 'Putrajaya: ' + format(datum.Growth, '.1%') : datum.state === 'W.P. Labuan' ? 'Labuan: ' + format(datum.Growth, '.1%') : format(datum.Growth, '.1%')",
+      "as": "Growth Label"
+    }
   ],
+  "projection": {"type": "mercator"},
   "layer": [
     {
-      "mark": {"type": "bar"},
+      "mark": {"type": "geoshape", "stroke": "#FFFFFF", "strokeWidth": 1},
       "encoding": {
-        "x": {
-          "field": "State Label", "type": "nominal",
-          "sort": {"field": "Order", "op": "min", "order": "ascending"},
-          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
-          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
-        },
-        "y": {
-          "field": "Start", "type": "quantitative",
-          "scale": {"zero": true},
-          "axis": {
-            "title": "Cumulative enrolment change (students)",
-            "format": "~s",
-            "gridColor": "#EEEEEE"
-          }
-        },
-        "y2": {"field": "Cumulative"},
+        "shape": {"field": "Boundary", "type": "geojson"},
         "color": {
-          "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
-          "legend": {"title": "Change direction", "orient": "right"}
+          "field": "Growth", "type": "quantitative",
+          "scale": {"domain": [-0.2, 0, 0.2], "range": ["#A64B5B", "#F2F2F2", "#76B7B2"], "clamp": true},
+          "legend": {
+            "title": "Enrolment growth",
+            "orient": "bottom",
+            "direction": "horizontal",
+            "format": ".0%",
+            "values": [-0.2, -0.1, 0, 0.1, 0.2],
+            "gradientLength": 250
+          }
         },
         "tooltip": [
           {"field": "State Label", "type": "nominal", "title": "State"},
           {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
           {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
-          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
-          {"field": "Direction", "type": "nominal", "title": "Direction"}
+          {"field": "Change", "type": "quantitative", "title": "Change in students", "format": "+,.0f"},
+          {"field": "Growth", "type": "quantitative", "title": "Enrolment growth", "format": "+.1%"}
         ]
       }
     },
     {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
-      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
-      },
+      "transform": [{"filter": "isValid(datum.anchorLon)"}],
+      "mark": {"type": "rule", "color": "#777777", "strokeWidth": 0.8},
       "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 390},
-        "text": {"field": "Net Label"}
+        "longitude": {"field": "anchorLon", "type": "quantitative"},
+        "latitude": {"field": "anchorLat", "type": "quantitative"},
+        "longitude2": {"field": "lon"},
+        "latitude2": {"field": "lat"}
       }
     },
     {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
       "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
+        "type": "text",
+        "fontSize": 11,
+        "fontWeight": "bold",
+        "color": "#FFFFFF",
+        "stroke": "#FFFFFF",
+        "strokeWidth": 3
       },
       "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 415},
-        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "text": {"field": "Growth Label", "type": "nominal"}
+      }
+    },
+    {
+      "mark": {"type": "text", "fontSize": 11, "fontWeight": "bold", "color": "#222222"},
+      "encoding": {
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "text": {"field": "Growth Label", "type": "nominal"},
+        "tooltip": [
+          {"field": "State Label", "type": "nominal", "title": "State"},
+          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
+          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
+          {"field": "Growth", "type": "quantitative", "title": "Enrolment growth", "format": "+.1%"}
+        ]
       }
     }
   ],
   "config": {
     "font": "Arial",
     "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
-    }
+    "legend": {"labelFontSize": 12, "titleFontSize": 13}
   }
 }
