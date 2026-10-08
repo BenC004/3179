@@ -1,0 +1,124 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "title": {
+    "text": "Which states drove Malaysia's enrolment changes?",
+    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "anchor": "start",
+    "fontSize": 22,
+    "subtitleFontSize": 14
+  },
+  "width": 700,
+  "height": 500,
+  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+  "transform": [
+    {"filter": "datum.state !== 'Malaysia'"},
+    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
+    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
+    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
+    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
+    {"calculate": "datum.Year === 2017 ? datum.students : 0", "as": "Baseline"},
+    {"calculate": "datum.Year === 2025 ? datum.students : 0", "as": "Latest"},
+    {
+      "aggregate": [
+        {"op": "sum", "field": "Baseline", "as": "Students 2017"},
+        {"op": "sum", "field": "Latest", "as": "Students 2025"}
+      ],
+      "groupby": ["state"]
+    },
+    {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
+    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
+    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
+    {
+      "window": [
+        {"op": "sum", "field": "Change", "as": "Cumulative"},
+        {"op": "row_number", "as": "Order"}
+      ],
+      "sort": [
+        {"field": "Change", "order": "descending"},
+        {"field": "state", "order": "ascending"}
+      ],
+      "frame": [null, 0]
+    },
+    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
+    {
+      "joinaggregate": [
+        {"op": "sum", "field": "Change", "as": "National Net Change"},
+        {"op": "count", "as": "State Count"}
+      ]
+    },
+    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
+  ],
+  "layer": [
+    {
+      "mark": {"type": "bar"},
+      "encoding": {
+        "x": {
+          "field": "State Label", "type": "nominal",
+          "sort": {"field": "Order", "op": "min", "order": "ascending"},
+          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
+          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
+        },
+        "y": {
+          "field": "Start", "type": "quantitative",
+          "scale": {"zero": true},
+          "axis": {
+            "title": "Cumulative enrolment change (students)",
+            "format": "~s",
+            "gridColor": "#EEEEEE"
+          }
+        },
+        "y2": {"field": "Cumulative"},
+        "color": {
+          "field": "Direction", "type": "nominal",
+          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
+          "legend": {"title": "Change direction", "orient": "right"}
+        },
+        "tooltip": [
+          {"field": "State Label", "type": "nominal", "title": "State"},
+          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
+          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
+          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
+          {"field": "Direction", "type": "nominal", "title": "Direction"}
+        ]
+      }
+    },
+    {
+      "data": {"values": [{}]},
+      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
+      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
+    },
+    {
+      "transform": [{"filter": "datum.Order === datum['State Count']"}],
+      "mark": {
+        "type": "text", "align": "left", "baseline": "top",
+        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
+      },
+      "encoding": {
+        "x": {"value": 290},
+        "y": {"value": 390},
+        "text": {"field": "Net Label"}
+      }
+    },
+    {
+      "transform": [{"filter": "datum.Order === datum['State Count']"}],
+      "mark": {
+        "type": "text", "align": "left", "baseline": "top",
+        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
+        "color": "#444444"
+      },
+      "encoding": {
+        "x": {"value": 290},
+        "y": {"value": 415},
+        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
+      }
+    }
+  ],
+  "config": {
+    "font": "Arial",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 11, "titleFontSize": 13,
+      "domain": false, "tickColor": "#CCCCCC"
+    }
+  }
+}
