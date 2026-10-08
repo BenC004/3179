@@ -116,9 +116,6 @@
   "config": {
     "font": "Arial",
     "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
-    }
+    "axis": {"labelFontSize": 11, "titleFontSize": 13, "domain": false, "tickColor": "#CCCCCC"}
   }
 }
