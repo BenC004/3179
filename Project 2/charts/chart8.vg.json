@@ -3,7 +3,7 @@
   "title": {
     "text": {"expr": "'How has the young population in ' + replace(selectedState, 'W.P. ', '') + ' changed?'"},
     "subtitle": [
-      "Population aged 0–24 by age group and sex, 2017 versus 2025",
+      "Population aged 0 - 24 by age group and sex, 2017 vs 2025",
       "Male on the left, female on the right. Both years use the same population scale."
     ],
     "anchor": "start",
@@ -57,12 +57,7 @@
     "column": {
       "field": "Year", "type": "ordinal",
       "sort": [2017, 2025],
-      "header": {
-        "title": null,
-        "labelFontSize": 18,
-        "labelFontWeight": "bold",
-        "labelPadding": 15
-      }
+      "header": {"title": null, "labelFontSize": 18, "labelFontWeight": "bold", "labelPadding": 15}
     }
   },
   "spacing": 40,
