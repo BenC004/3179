@@ -1,124 +1,171 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
   "title": {
-    "text": "Which states drove Malaysia's enrolment changes?",
-    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "text": {"expr": "'How has the young population in ' + replace(selectedState, 'W.P. ', '') + ' changed?'"},
+    "subtitle": [
+      "Population aged 0–24 by age group and sex, 2017 versus 2025",
+      "Male on the left, female on the right. Both years use the same population scale."
+    ],
     "anchor": "start",
     "fontSize": 22,
-    "subtitleFontSize": 14
+    "subtitleFontSize": 13
   },
-  "width": 700,
-  "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
-  "transform": [
-    {"filter": "datum.state !== 'Malaysia'"},
-    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
-    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
-    {"calculate": "datum.Year === 2017 ? datum.students : 0", "as": "Baseline"},
-    {"calculate": "datum.Year === 2025 ? datum.students : 0", "as": "Latest"},
+  "data": {"url": "../source2/population_state.csv", "format": {"type": "csv", "parse": {"population": "number"}}},
+  "params": [
     {
-      "aggregate": [
-        {"op": "sum", "field": "Baseline", "as": "Students 2017"},
-        {"op": "sum", "field": "Latest", "as": "Students 2025"}
-      ],
-      "groupby": ["state"]
-    },
-    {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
-    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
-    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
-    {
-      "window": [
-        {"op": "sum", "field": "Change", "as": "Cumulative"},
-        {"op": "row_number", "as": "Order"}
-      ],
-      "sort": [
-        {"field": "Change", "order": "descending"},
-        {"field": "state", "order": "ascending"}
-      ],
-      "frame": [null, 0]
-    },
-    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
-    {
-      "joinaggregate": [
-        {"op": "sum", "field": "Change", "as": "National Net Change"},
-        {"op": "count", "as": "State Count"}
-      ]
-    },
-    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
-  ],
-  "layer": [
-    {
-      "mark": {"type": "bar"},
-      "encoding": {
-        "x": {
-          "field": "State Label", "type": "nominal",
-          "sort": {"field": "Order", "op": "min", "order": "ascending"},
-          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
-          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
-        },
-        "y": {
-          "field": "Start", "type": "quantitative",
-          "scale": {"zero": true},
-          "axis": {
-            "title": "Cumulative enrolment change (students)",
-            "format": "~s",
-            "gridColor": "#EEEEEE"
-          }
-        },
-        "y2": {"field": "Cumulative"},
-        "color": {
-          "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
-          "legend": {"title": "Change direction", "orient": "right"}
-        },
-        "tooltip": [
-          {"field": "State Label", "type": "nominal", "title": "State"},
-          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
-          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
-          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
-          {"field": "Direction", "type": "nominal", "title": "Direction"}
+      "name": "selectedState",
+      "value": "Malaysia",
+      "bind": {
+        "input": "select",
+        "name": "Selected state: ",
+        "options": [
+          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
+          "Selangor", "Terengganu", "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+        ],
+        "labels": [
+          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
+          "Selangor", "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
         ]
-      }
-    },
-    {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
-      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 390},
-        "text": {"field": "Net Label"}
-      }
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 415},
-        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
       }
     }
   ],
+  "transform": [
+    {"filter": "datum.state !== 'Malaysia'"},
+    {"filter": "selectedState === 'Malaysia' || datum.state === selectedState"},
+    {"filter": "datum.ethnicity === 'overall'"},
+    {"filter": "datum.sex === 'male' || datum.sex === 'female'"},
+    {"filter": "indexof(['0-4', '5-9', '10-14', '15-19', '20-24'], datum.age) >= 0"},
+    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
+    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
+    {
+      "aggregate": [{"op": "sum", "field": "population", "as": "Population Thousands"}],
+      "groupby": ["Year", "age", "sex"]
+    },
+    {"calculate": "datum['Population Thousands'] * 1000", "as": "Population"},
+    {
+      "joinaggregate": [{"op": "sum", "field": "Population", "as": "Age Group Total"}],
+      "groupby": ["Year", "age"]
+    },
+    {"calculate": "datum.sex === 'male' ? 'Male' : 'Female'", "as": "Sex"},
+    {"calculate": "datum.sex === 'male' ? -datum.Population : datum.Population", "as": "Signed Population"},
+    {"calculate": "-datum.Population", "as": "Negative Population"},
+    {"calculate": "replace(selectedState, 'W.P. ', '')", "as": "Location"}
+  ],
+  "facet": {
+    "column": {
+      "field": "Year", "type": "ordinal",
+      "sort": [2017, 2025],
+      "header": {
+        "title": null,
+        "labelFontSize": 18,
+        "labelFontWeight": "bold",
+        "labelPadding": 15
+      }
+    }
+  },
+  "spacing": 40,
+  "spec": {
+    "width": 350,
+    "height": 450,
+    "encoding": {
+      "x": {
+        "field": "Signed Population", "type": "quantitative",
+        "scale": {"zero": true, "nice": true},
+        "axis": {
+          "title": "Population",
+          "labelExpr": "format(abs(datum.value), '~s')",
+          "tickCount": 5,
+          "labelOverlap": true,
+          "labelPadding": 6,
+          "titlePadding": 12,
+          "grid": true,
+          "gridColor": "#EEEEEE"
+        }
+      },
+      "y": {
+        "field": "age", "type": "ordinal",
+        "sort": ["20-24", "15-19", "10-14", "5-9", "0-4"],
+        "scale": {"paddingInner": 0.2, "paddingOuter": 0.1},
+        "axis": {
+          "title": "Age group",
+          "labelPadding": 8,
+          "ticks": false,
+          "domain": false
+        }
+      }
+    },
+    "layer": [
+      {
+        "mark": {"type": "bar"},
+        "encoding": {
+          "x2": {"datum": 0},
+          "color": {
+            "field": "Sex", "type": "nominal",
+            "scale": {"domain": ["Male", "Female"], "range": ["#4E79A7", "#CC7A91"]},
+            "legend": {"title": null, "orient": "top"}
+          },
+          "tooltip": [
+            {"field": "Location", "type": "nominal", "title": "Location"},
+            {"field": "Year", "type": "quantitative", "title": "Year", "format": "d"},
+            {"field": "age", "type": "ordinal", "title": "Age group"},
+            {"field": "Sex", "type": "nominal", "title": "Sex"},
+            {"field": "Population", "type": "quantitative", "title": "Population", "format": ",.0f"},
+            {"field": "Age Group Total", "type": "quantitative", "title": "Male + female total in this age group", "format": ",.0f"}
+          ]
+        }
+      },
+      {
+        "mark": {"type": "rule", "opacity": 0, "tooltip": null},
+        "encoding": {
+          "x": {
+            "field": "Population", "type": "quantitative",
+            "scale": {"zero": true, "nice": true},
+            "axis": {
+              "title": "Population",
+              "labelExpr": "format(abs(datum.value), '~s')",
+              "tickCount": 5,
+              "labelOverlap": true,
+              "labelPadding": 6,
+              "titlePadding": 12,
+              "grid": true,
+              "gridColor": "#EEEEEE"
+            }
+          },
+          "x2": {"field": "Negative Population"}
+        }
+      },
+      {
+        "mark": {
+          "type": "text",
+          "fontSize": 11,
+          "fontWeight": "bold",
+          "color": "#FFFFFF",
+          "align": {"expr": "datum.sex === 'male' ? 'left' : 'right'"},
+          "dx": {"expr": "datum.sex === 'male' ? 8 : -8"}
+        },
+        "encoding": {
+          "text": {"field": "Population", "type": "quantitative", "format": ".3~s"}
+        }
+      },
+      {
+        "mark": {"type": "rule", "color": "#777777", "strokeWidth": 1},
+        "encoding": {
+          "x": {"datum": 0, "type": "quantitative"},
+          "y": {"value": 0},
+          "y2": {"value": 450}
+        }
+      }
+    ]
+  },
+  "resolve": {
+    "scale": {"x": "shared", "y": "shared", "color": "shared"}
+  },
   "config": {
     "font": "Arial",
     "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
-    }
+    "axis": {"labelFontSize": 11, "titleFontSize": 13, "domain": false, "tickColor": "#CCCCCC"},
+    "legend": {"labelFontSize": 12}
   }
 }
