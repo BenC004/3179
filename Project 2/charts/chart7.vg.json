@@ -1,124 +1,244 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "$schema": "https://vega.github.io/schema/vega/v6.json",
+  "description": "Parallel coordinates comparing demographic and school enrolment changes by state.",
+  "width": 800,
+  "height": 500,
+  "padding": 20,
   "title": {
-    "text": "Which states drove Malaysia's enrolment changes?",
-    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "text": "Do enrolment changes follow the child-population trend?",
+    "subtitle": [
+      "Percentage change by state, 2017 - 2025. All three axes use the same scale.",
+      "Population aged 5 - 14 is used for comparison; it does not exactly match primary or secondary school ages.",
+      "Select a state or hover over a line to highlight its profile."
+    ],
     "anchor": "start",
     "fontSize": 22,
-    "subtitleFontSize": 14
+    "subtitleFontSize": 13,
+    "offset": 40
   },
-  "width": 700,
-  "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
-  "transform": [
-    {"filter": "datum.state !== 'Malaysia'"},
-    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
-    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
-    {"calculate": "datum.Year === 2017 ? datum.students : 0", "as": "Baseline"},
-    {"calculate": "datum.Year === 2025 ? datum.students : 0", "as": "Latest"},
+  "signals": [
     {
-      "aggregate": [
-        {"op": "sum", "field": "Baseline", "as": "Students 2017"},
-        {"op": "sum", "field": "Latest", "as": "Students 2025"}
-      ],
-      "groupby": ["state"]
-    },
-    {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
-    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
-    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
-    {
-      "window": [
-        {"op": "sum", "field": "Change", "as": "Cumulative"},
-        {"op": "row_number", "as": "Order"}
-      ],
-      "sort": [
-        {"field": "Change", "order": "descending"},
-        {"field": "state", "order": "ascending"}
-      ],
-      "frame": [null, 0]
-    },
-    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
-    {
-      "joinaggregate": [
-        {"op": "sum", "field": "Change", "as": "National Net Change"},
-        {"op": "count", "as": "State Count"}
-      ]
-    },
-    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
-  ],
-  "layer": [
-    {
-      "mark": {"type": "bar"},
-      "encoding": {
-        "x": {
-          "field": "State Label", "type": "nominal",
-          "sort": {"field": "Order", "op": "min", "order": "ascending"},
-          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
-          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
-        },
-        "y": {
-          "field": "Start", "type": "quantitative",
-          "scale": {"zero": true},
-          "axis": {
-            "title": "Cumulative enrolment change (students)",
-            "format": "~s",
-            "gridColor": "#EEEEEE"
-          }
-        },
-        "y2": {"field": "Cumulative"},
-        "color": {
-          "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
-          "legend": {"title": "Change direction", "orient": "right"}
-        },
-        "tooltip": [
-          {"field": "State Label", "type": "nominal", "title": "State"},
-          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
-          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
-          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
-          {"field": "Direction", "type": "nominal", "title": "Direction"}
+      "name": "selectedState",
+      "value": "All states",
+      "bind": {
+        "input": "select",
+        "name": "Highlight state: ",
+        "options": [
+          "All states", "Johor", "Kedah", "Kelantan", "Melaka",
+          "Negeri Sembilan", "Pahang", "Perak", "Perlis", "Pulau Pinang",
+          "Sabah", "Sarawak", "Selangor", "Terengganu",
+          "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+        ],
+        "labels": [
+          "All states", "Johor", "Kedah", "Kelantan", "Melaka",
+          "Negeri Sembilan", "Pahang", "Perak", "Perlis", "Pulau Pinang",
+          "Sabah", "Sarawak", "Selangor", "Terengganu",
+          "Kuala Lumpur", "Labuan", "Putrajaya"
         ]
       }
     },
     {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
-      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
+      "name": "hoveredState",
+      "value": null,
+      "on": [
+        {"events": "@stateLines:mouseover", "update": "datum.state"},
+        {"events": "@stateLines:mouseout", "update": "null"},
+        {"events": "@statePoints:mouseover", "update": "datum.state"},
+        {"events": "@statePoints:mouseout", "update": "null"}
+      ]
+    }
+  ],
+  "data": [
+    {
+      "name": "population",
+      "url": "../source2/population_state.csv", "format": {"type": "csv", "parse": {"population": "number"}},
+      "transform": [
+        {"type": "filter", "expr": "datum.sex === 'both' && datum.ethnicity === 'overall'"},
+        {"type": "filter", "expr": "datum.age === '5-9' || datum.age === '10-14'"},
+        {"type": "formula", "expr": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
+        {"type": "filter", "expr": "datum.Year === 2017 || datum.Year === 2025"},
+        {"type": "formula", "expr": "datum.Year === 2017 ? datum.population * 1000 : 0", "as": "Baseline"},
+        {"type": "formula", "expr": "datum.Year === 2025 ? datum.population * 1000 : 0", "as": "Latest"},
+        {
+          "type": "aggregate",
+          "groupby": ["state"],
+          "fields": ["Baseline", "Latest"],
+          "ops": ["sum", "sum"],
+          "as": ["Children2017", "Children2025"]
+        },
+        {"type": "filter", "expr": "datum.Children2017 > 0 && datum.Children2025 > 0"},
+        {"type": "formula", "expr": "(datum.Children2025 - datum.Children2017) / datum.Children2017", "as": "ChildGrowth"}
+      ]
     },
     {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 390},
-        "text": {"field": "Net Label"}
+      "name": "comparison",
+      "url": "../source1/enrolment_school_district.csv",
+      "format": {"type": "csv", "parse": {"students": "number"}},
+      "transform": [
+        {"type": "filter", "expr": "datum.state !== 'Malaysia'"},
+        {"type": "filter", "expr": "datum.district === 'All Districts' && datum.sex === 'both'"},
+        {"type": "filter", "expr": "datum.stage === 'primary' || datum.stage === 'secondary'"},
+        {"type": "formula", "expr": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
+        {"type": "filter", "expr": "datum.Year === 2017 || datum.Year === 2025"},
+        {"type": "formula", "expr": "datum.stage === 'primary' && datum.Year === 2017 ? datum.students : 0", "as": "P2017"},
+        {"type": "formula", "expr": "datum.stage === 'primary' && datum.Year === 2025 ? datum.students : 0", "as": "P2025"},
+        {"type": "formula", "expr": "datum.stage === 'secondary' && datum.Year === 2017 ? datum.students : 0", "as": "S2017"},
+        {"type": "formula", "expr": "datum.stage === 'secondary' && datum.Year === 2025 ? datum.students : 0", "as": "S2025"},
+        {
+          "type": "aggregate",
+          "groupby": ["state"],
+          "fields": ["P2017", "P2025", "S2017", "S2025"],
+          "ops": ["sum", "sum", "sum", "sum"],
+          "as": ["Primary2017", "Primary2025", "Secondary2017", "Secondary2025"]
+        },
+        {"type": "filter", "expr": "datum.Primary2017 > 0 && datum.Primary2025 > 0 && datum.Secondary2017 > 0 && datum.Secondary2025 > 0"},
+        {"type": "formula", "expr": "(datum.Primary2025 - datum.Primary2017) / datum.Primary2017", "as": "PrimaryGrowth"},
+        {"type": "formula", "expr": "(datum.Secondary2025 - datum.Secondary2017) / datum.Secondary2017", "as": "SecondaryGrowth"},
+        {"type": "lookup", "from": "population", "key": "state", "fields": ["state"], "values": ["ChildGrowth"], "as": ["ChildGrowth"]},
+        {"type": "filter", "expr": "isValid(datum.ChildGrowth)"},
+        {"type": "formula", "expr": "replace(datum.state, 'W.P. ', '')", "as": "StateLabel"}
+      ]
+    },
+    {
+      "name": "profiles",
+      "source": "comparison",
+      "transform": [
+        {"type": "fold", "fields": ["ChildGrowth", "PrimaryGrowth", "SecondaryGrowth"], "as": ["Measure", "Growth"]},
+        {"type": "formula", "expr": "datum.Measure === 'ChildGrowth' ? 0 : datum.Measure === 'PrimaryGrowth' ? 1 : 2", "as": "MeasureOrder"},
+        {"type": "collect", "sort": {"field": ["state", "MeasureOrder"], "order": ["ascending", "ascending"]}}
+      ]
+    },
+    {
+      "name": "headers",
+      "values": [
+        {"Measure": "ChildGrowth", "Label": "Population aged 5 - 14"},
+        {"Measure": "PrimaryGrowth", "Label": "Primary enrolment"},
+        {"Measure": "SecondaryGrowth", "Label": "Secondary enrolment"}
+      ]
+    }
+  ],
+  "scales": [
+    {"name": "x", "type": "point", "domain": ["ChildGrowth", "PrimaryGrowth", "SecondaryGrowth"], "range": [70, {"signal": "width - 80"}]},
+    {"name": "growth", "type": "linear", "domain": {"data": "profiles", "field": "Growth"}, "range": "height", "zero": true, "nice": true}
+  ],
+  "axes": [
+    {
+      "orient": "left",
+      "scale": "growth",
+      "offset": {"scale": "x", "value": "ChildGrowth", "mult": -1},
+      "format": ".0%",
+      "tickCount": 8,
+      "domain": true,
+      "grid": false
+    },
+    {
+      "orient": "left",
+      "scale": "growth",
+      "offset": {"scale": "x", "value": "PrimaryGrowth", "mult": -1},
+      "format": ".0%",
+      "tickCount": 8,
+      "domain": true,
+      "grid": false
+    },
+    {
+      "orient": "left",
+      "scale": "growth",
+      "offset": {"scale": "x", "value": "SecondaryGrowth", "mult": -1},
+      "format": ".0%",
+      "tickCount": 8,
+      "domain": true,
+      "grid": false
+    }
+  ],
+  "marks": [
+    {
+      "type": "rule",
+      "interactive": false,
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "value": "ChildGrowth"},
+          "x2": {"scale": "x", "value": "SecondaryGrowth"},
+          "y": {"scale": "growth", "value": 0},
+          "stroke": {"value": "#999999"},
+          "strokeDash": {"value": [4, 4]},
+          "strokeWidth": {"value": 1}
+        }
       }
     },
     {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
+      "type": "group",
+      "from": {
+        "facet": {
+          "name": "stateProfile",
+          "data": "profiles",
+          "groupby": ["state"]
+        }
       },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 415},
-        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
+      "encode": {
+        "update": {
+          "zindex": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 1 : 0"}
+        }
+      },
+      "marks": [
+        {
+          "name": "stateLines",
+          "type": "line",
+          "from": {"data": "stateProfile"},
+          "sort": {"field": "datum.MeasureOrder"},
+          "encode": {
+            "update": {
+              "x": {"scale": "x", "field": "Measure"},
+              "y": {"scale": "growth", "field": "Growth"},
+              "stroke": {"signal": "datum.state === selectedState || datum.state === hoveredState || selectedState === 'All states' ? '#756BB1' : '#BBBBBB'"},
+              "strokeWidth": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 3 : 1.5"},
+              "strokeOpacity": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 1 : selectedState === 'All states' ? 0.45 : 0.3"},
+              "tooltip": {
+                "signal": "{'State': datum.StateLabel, 'Child population growth': format(datum.ChildGrowth, '+.1%'), 'Primary enrolment growth': format(datum.PrimaryGrowth, '+.1%'), 'Secondary enrolment growth': format(datum.SecondaryGrowth, '+.1%')}"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "statePoints",
+      "type": "symbol",
+      "from": {"data": "profiles"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Measure"},
+          "y": {"scale": "growth", "field": "Growth"},
+          "size": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 90 : 35"},
+          "fill": {"signal": "datum.state === selectedState || datum.state === hoveredState || selectedState === 'All states' ? '#756BB1' : '#BBBBBB'"},
+          "fillOpacity": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 1 : 0.35"},
+          "stroke": {"value": "#FFFFFF"},
+          "strokeWidth": {"value": 0.5},
+          "tooltip": {
+            "signal": "{'State': datum.StateLabel, 'Child population growth': format(datum.ChildGrowth, '+.1%'), 'Primary enrolment growth': format(datum.PrimaryGrowth, '+.1%'), 'Secondary enrolment growth': format(datum.SecondaryGrowth, '+.1%')}"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "headers"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Measure"},
+          "y": {"value": -15},
+          "text": {"field": "Label"},
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fontSize": {"value": 13},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#222222"}
+        }
       }
     }
   ],
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
-    }
+    "axis": {"labelFontSize": 11, "labelPadding": 6, "domainColor": "#CCCCCC", "tickColor": "#CCCCCC"}
   }
 }

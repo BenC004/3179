@@ -109,14 +109,7 @@
       }
     },
     {
-      "mark": {
-        "type": "text",
-        "fontSize": 11,
-        "fontWeight": "bold",
-        "color": "#FFFFFF",
-        "stroke": "#FFFFFF",
-        "strokeWidth": 3
-      },
+      "mark": {"type": "text", "fontSize": 11, "fontWeight": "bold", "color": "#FFFFFF", "stroke": "#FFFFFF", "strokeWidth": 3},
       "encoding": {
         "longitude": {"field": "lon", "type": "quantitative"},
         "latitude": {"field": "lat", "type": "quantitative"},

@@ -89,10 +89,7 @@
     },
     {
       "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
-      },
+      "mark": {"type": "text", "align": "left", "baseline": "top", "fontSize": 14, "fontWeight": "bold", "color": "#222222"},
       "encoding": {
         "x": {"value": 290},
         "y": {"value": 390},
@@ -101,11 +98,7 @@
     },
     {
       "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
-      },
+      "mark": {"type": "text", "align": "left", "baseline": "top", "fontSize": 13, "lineBreak": "\n", "lineHeight": 18, "color": "#444444"},
       "encoding": {
         "x": {"value": 290},
         "y": {"value": 415},

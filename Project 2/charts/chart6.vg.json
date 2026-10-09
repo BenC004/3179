@@ -112,13 +112,7 @@
       }
     },
     {
-      "mark": {
-        "type": "text",
-        "fontSize": 16,
-        "fontWeight": "bold",
-        "lineBreak": "\n",
-        "lineHeight": 24
-      },
+      "mark": {"type": "text", "fontSize": 16, "fontWeight": "bold", "lineBreak": "\n", "lineHeight": 24},
       "encoding": {
         "x": {"field": "X Centre", "type": "quantitative", "axis": null},
         "y": {"field": "Y Centre", "type": "quantitative", "axis": null},
