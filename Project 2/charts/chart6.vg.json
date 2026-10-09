@@ -1,124 +1,145 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
   "title": {
-    "text": "Which states drove Malaysia's enrolment changes?",
-    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "text": {"expr": "'Who are the students in ' + replace(selectedState, 'W.P. ', '') + '?'"},
+    "subtitle": [
+      "Government primary and secondary school enrolment, 2025",
+      "Column width shows stage share; section height shows male/female share within that stage."
+    ],
     "anchor": "start",
     "fontSize": 22,
-    "subtitleFontSize": 14
+    "subtitleFontSize": 13
   },
-  "width": 700,
+  "width": 800,
   "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+  "data": {"url": "../source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+  "params": [
+    {
+      "name": "selectedState",
+      "value": "Malaysia",
+      "bind": {
+        "input": "select",
+        "name": "Selected state: ",
+        "options": [
+          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor", 
+          "Terengganu", "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+        ],
+        "labels": [
+          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor", 
+          "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
+        ]
+      }
+    }
+  ],
   "transform": [
-    {"filter": "datum.state !== 'Malaysia'"},
-    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
+    {"filter": "datum.state === selectedState"},
+    {"filter": "datum.district === 'All Districts'"},
+    {"filter": "datum.sex === 'male' || datum.sex === 'female'"},
     {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
     {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
-    {"calculate": "datum.Year === 2017 ? datum.students : 0", "as": "Baseline"},
-    {"calculate": "datum.Year === 2025 ? datum.students : 0", "as": "Latest"},
+    {"filter": "datum.Year === 2025"},
     {
-      "aggregate": [
-        {"op": "sum", "field": "Baseline", "as": "Students 2017"},
-        {"op": "sum", "field": "Latest", "as": "Students 2025"}
-      ],
-      "groupby": ["state"]
+      "aggregate": [{"op": "sum", "field": "students", "as": "Students"}],
+      "groupby": ["state", "stage", "sex"]
     },
-    {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
-    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
-    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
     {
-      "window": [
-        {"op": "sum", "field": "Change", "as": "Cumulative"},
-        {"op": "row_number", "as": "Order"}
-      ],
-      "sort": [
-        {"field": "Change", "order": "descending"},
-        {"field": "state", "order": "ascending"}
-      ],
-      "frame": [null, 0]
+      "joinaggregate": [{"op": "sum", "field": "Students", "as": "Stage Students"}],
+      "groupby": ["stage"]
     },
-    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
+    {"calculate": "datum.stage === 'primary' ? datum.Students : 0", "as": "Primary Students"},
     {
       "joinaggregate": [
-        {"op": "sum", "field": "Change", "as": "National Net Change"},
-        {"op": "count", "as": "State Count"}
+        {"op": "sum", "field": "Students", "as": "Total Students"},
+        {"op": "sum", "field": "Primary Students", "as": "Primary Total"}
       ]
     },
-    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
+    {"calculate": "datum.stage === 'primary' ? 'Primary' : 'Secondary'", "as": "School Stage"},
+    {"calculate": "datum.sex === 'male' ? 'Male' : 'Female'", "as": "Sex"},
+    {"calculate": "datum['Stage Students'] / datum['Total Students']", "as": "Stage Share"},
+    {"calculate": "datum.Students / datum['Stage Students']", "as": "Sex Share"},
+    {"calculate": "datum.Students / datum['Total Students']", "as": "Overall Share"},
+    {"calculate": "datum.stage === 'primary' ? 0 : datum['Primary Total'] / datum['Total Students']", "as": "X Start"},
+    {"calculate": "datum.stage === 'primary' ? datum['Primary Total'] / datum['Total Students'] : 1", "as": "X End"},
+    {
+      "stack": "Students",
+      "groupby": ["stage"],
+      "sort": [{"field": "sex", "order": "descending"}],
+      "offset": "normalize",
+      "as": ["Y Start", "Y End"]
+    },
+    {"calculate": "(datum['X Start'] + datum['X End']) / 2", "as": "X Centre"},
+    {"calculate": "(datum['Y Start'] + datum['Y End']) / 2", "as": "Y Centre"},
+    {"calculate": "datum.Sex + '\\n' + format(datum['Sex Share'], '.1%')", "as": "Section Label"},
+    {"calculate": "datum['School Stage'] + ' (' + format(datum['Stage Share'], '.1%') + ')'", "as": "Stage Label"}
   ],
   "layer": [
     {
-      "mark": {"type": "bar"},
+      "mark": {"type": "rect", "stroke": "#FFFFFF", "strokeWidth": 2},
       "encoding": {
         "x": {
-          "field": "State Label", "type": "nominal",
-          "sort": {"field": "Order", "op": "min", "order": "ascending"},
-          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
-          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
+          "field": "X Start", "type": "quantitative",
+          "scale": {"domain": [0, 1], "nice": false},
+          "axis": null
         },
+        "x2": {"field": "X End"},
         "y": {
-          "field": "Start", "type": "quantitative",
-          "scale": {"zero": true},
+          "field": "Y Start", "type": "quantitative",
+          "scale": {"domain": [0, 1], "nice": false},
           "axis": {
-            "title": "Cumulative enrolment change (students)",
-            "format": "~s",
-            "gridColor": "#EEEEEE"
+            "title": "Share within school stage",
+            "format": ".0%",
+            "values": [0, 0.25, 0.5, 0.75, 1],
+            "grid": false
           }
         },
-        "y2": {"field": "Cumulative"},
+        "y2": {"field": "Y End"},
         "color": {
-          "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
-          "legend": {"title": "Change direction", "orient": "right"}
+          "field": "Sex", "type": "nominal",
+          "scale": {"domain": ["Male", "Female"], "range": ["#4E79A7", "#CC7A91"]},
+          "legend": {"title": "Sex", "orient": "right"}
         },
         "tooltip": [
-          {"field": "State Label", "type": "nominal", "title": "State"},
-          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
-          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
-          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
-          {"field": "Direction", "type": "nominal", "title": "Direction"}
+          {"field": "state", "type": "nominal", "title": "Location"},
+          {"field": "School Stage", "type": "nominal", "title": "School stage"},
+          {"field": "Sex", "type": "nominal", "title": "Sex"},
+          {"field": "Students", "type": "quantitative", "title": "Students", "format": ",.0f"},
+          {"field": "Sex Share", "type": "quantitative", "title": "Share within this stage", "format": ".1%"},
+          {"field": "Stage Share", "type": "quantitative", "title": "Stage share of all students", "format": ".1%"},
+          {"field": "Overall Share", "type": "quantitative", "title": "Section share of all students", "format": ".1%"}
         ]
       }
     },
     {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
-      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
       "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
+        "type": "text",
+        "fontSize": 16,
+        "fontWeight": "bold",
+        "lineBreak": "\n",
+        "lineHeight": 24
       },
       "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 390},
-        "text": {"field": "Net Label"}
+        "x": {"field": "X Centre", "type": "quantitative", "axis": null},
+        "y": {"field": "Y Centre", "type": "quantitative", "axis": null},
+        "text": {"field": "Section Label", "type": "nominal"},
+        "color": {"value": "#FFFFFF"}
       }
     },
     {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
-      },
+      "transform": [{"filter": "datum.sex === 'male'"}],
+      "mark": {"type": "text", "fontSize": 14, "fontWeight": "bold", "baseline": "top", "color": "#222222"},
       "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 415},
-        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
+        "x": {"field": "X Centre", "type": "quantitative", "axis": null},
+        "y": {"value": 515},
+        "text": {"field": "Stage Label", "type": "nominal"}
       }
     }
   ],
   "config": {
     "font": "Arial",
     "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
-    }
+    "axis": {"labelFontSize": 12, "titleFontSize": 13, "domain": false, "tickColor": "#CCCCCC"},
+    "legend": {"labelFontSize": 12, "titleFontSize": 13}
   }
 }
