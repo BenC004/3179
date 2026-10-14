@@ -287,7 +287,6 @@
     {
       "orient": "left",
       "scale": "y",
-      "title": null,
       "ticks": false,
       "domain": false,
       "labelPadding": 10,

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Malaysia's Changing Classrooms</title>
+
+  <!-- Import Vega and Vega-Lite -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+
+  <!-- CSS file -->
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="css/styles.css"
+    media="all"
+  >
+</head>
+
+<body>
+
+  <div class="page">
+
+    <h1>Malaysia's Changing Classrooms</h1>
+
+    <p class="subtitle">
+      Student enrolment, demographics, schools and teachers
+    </p>
+
+    <p>
+      Malaysia's student numbers look stable nationally,
+      but how are they changing across states?
+    </p>
+
+    <p>
+      This visualisation explores enrolment from 2017 to 2025,
+      demographic patterns and the provision of schools
+      and teachers.
+    </p>
+
+    <!-- Section 1 -->
+    <div class="section">
+
+      <p class="section-label">Part 1 — Enrolment trends</p>
+
+      <h2>How have student numbers changed over time?</h2>
+
+      <p>
+        A stable national total can conceal different
+        trends in primary and secondary enrolment.
+      </p>
+
+      <div id="chart1" class="chart"></div>
+
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section">
+
+      <p class="section-label">Part 2 — State differences</p>
+
+      <h2>Where are enrolments growing or declining?</h2>
+
+      <p>
+        Compare state contributions, percentage changes,
+        student concentration and annual enrolment patterns.
+      </p>
+
+      <div id="chart2" class="chart"></div>
+
+      <div id="chart3" class="chart"></div>
+
+      <div id="chart4" class="chart"></div>
+
+      <div id="chart5" class="chart"></div>
+
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section">
+
+      <p class="section-label">Part 3 — Demographics</p>
+
+      <h2>How do gender and demographic patterns differ?</h2>
+
+      <p>
+        Student composition, the young population and births
+        provide context for current enrolment and future
+        school demand.
+      </p>
+
+      <div id="chart6" class="chart"></div>
+
+      <div id="chart7" class="chart"></div>
+
+      <div id="chart8" class="chart"></div>
+
+      <div id="chart9" class="chart"></div>
+
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section">
+
+      <p class="section-label">Part 4 — Schools and teachers</p>
+
+      <h2>Are schools and teachers keeping pace?</h2>
+
+      <p>
+        Compare school provision with student numbers,
+        examine teacher growth and explore staffing
+        differences across districts.
+      </p>
+
+      <div id="chart10" class="chart"></div>
+
+      <div id="chart11" class="chart"></div>
+
+      <div id="chart12" class="chart"></div>
+
+    </div>
+
+    <div class="footer">
+      <p>Author: YOUR NAME | October 2026</p>
+      <p>Charts created using Vega and Vega-Lite.</p>
+    </div>
+
+  </div>
+
+  <script type="text/javascript">
+
+    // Base folder for chart JSONs and their relative data paths.
+    var chartFolder = new URL(
+      "charts/",
+      window.location.href
+    ).href;
+
+    var chartOptions = {
+      loader: {
+        baseURL: chartFolder
+      },
+      actions: false
+    };
+
+    var spec1 = chartFolder + "chart1.vg.json";
+    vegaEmbed("#chart1", spec1, chartOptions)
+      .catch(console.error);
+
+    var spec2 = chartFolder + "chart2.vg.json";
+    vegaEmbed("#chart2", spec2, chartOptions)
+      .catch(console.error);
+
+    var spec3 = chartFolder + "chart3.vg.json";
+    vegaEmbed("#chart3", spec3, chartOptions)
+      .catch(console.error);
+
+    var spec4 = chartFolder + "chart4.vg.json";
+    vegaEmbed("#chart4", spec4, chartOptions)
+      .catch(console.error);
+
+    var spec5 = chartFolder + "chart5.vg.json";
+    vegaEmbed("#chart5", spec5, chartOptions)
+      .catch(console.error);
+
+    var spec6 = chartFolder + "chart6.vg.json";
+    vegaEmbed("#chart6", spec6, chartOptions)
+      .catch(console.error);
+
+    var spec7 = chartFolder + "chart7.vg.json";
+    vegaEmbed("#chart7", spec7, chartOptions)
+      .catch(console.error);
+
+    var spec8 = chartFolder + "chart8.vg.json";
+    vegaEmbed("#chart8", spec8, chartOptions)
+      .catch(console.error);
+
+    var spec9 = chartFolder + "chart9.vg.json";
+    vegaEmbed("#chart9", spec9, chartOptions)
+      .catch(console.error);
+
+    var spec10 = chartFolder + "chart10.vg.json";
+    vegaEmbed("#chart10", spec10, chartOptions)
+      .catch(console.error);
+
+    var spec11 = chartFolder + "chart11.vg.json";
+    vegaEmbed("#chart11", spec11, chartOptions)
+      .catch(console.error);
+
+    var spec12 = chartFolder + "chart12.vg.json";
+    vegaEmbed("#chart12", spec12, chartOptions)
+      .catch(console.error);
+
+  </script>
+
+</body>
+</html>
