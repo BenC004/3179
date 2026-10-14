@@ -1,36 +1,35 @@
-/* Page background and default text */
+/* Default sizing */
+* {
+  box-sizing: border-box;
+}
+
+/* Background and typography */
 body {
   margin: 0;
-  background-color: #f2f1ed;
+  background: #f2f1ed;
   color: #263238;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.6;
 }
 
-/* Include padding within element widths */
-* {
-  box-sizing: border-box;
-}
-
-/* Main white content area */
+/* Main content area */
 .page {
   width: calc(100% - 40px);
-  max-width: 1100px;
+  max-width: 1240px;
   margin: 30px auto;
-  padding: 40px;
-  background-color: white;
+  padding: 30px;
+  background: white;
 }
 
 /* Main title */
 h1 {
-  margin-top: 0;
-  margin-bottom: 10px;
+  margin: 0 0 10px;
   font-family: Georgia, serif;
   font-size: 40px;
   line-height: 1.2;
 }
 
-/* Subtitle below the title */
+/* Subtitle */
 .subtitle {
   margin-bottom: 25px;
   color: #607078;
@@ -38,11 +37,10 @@ h1 {
   font-weight: bold;
 }
 
-/* Paragraphs */
+/* Body paragraphs */
 p {
   max-width: 60ch;
-  margin-top: 0;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
   font-size: 16px;
 }
 
@@ -53,7 +51,7 @@ p {
   border-top: 1px solid #dddddd;
 }
 
-/* Small numbered section labels */
+/* Small section labels */
 .section-label {
   margin-bottom: 10px;
   color: #80654d;
@@ -65,24 +63,70 @@ p {
 
 /* Section headings */
 h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
   font-size: 26px;
   line-height: 1.3;
 }
 
-/* Space around each chart */
-.chart {
-  max-width: 100%;
-  margin-top: 25px;
-  margin-bottom: 40px;
-  overflow-x: auto;
+/* Paired chart headings */
+h3 {
+  margin: 0 0 10px;
+  font-size: 19px;
+  line-height: 1.3;
 }
 
-/* Chart dropdowns and other existing controls */
+/* Full-width charts */
+.chart {
+  max-width: 100%;
+  margin: 25px 0 40px;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.chart .vega-embed {
+  max-width: 100%;
+  text-align: left;
+}
+
+/* Two charts in one row */
+.chart-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  margin: 25px 0 40px;
+  align-items: start;
+}
+
+/* Each column */
+.chart-card {
+  min-width: 0;
+}
+
+/* Align the start of paired charts */
+.chart-card h3 {
+  min-height: 50px;
+}
+
+.chart-card > .chart-note {
+  min-height: 66px;
+}
+
+/* Short explanations */
+.chart-note {
+  color: #607078;
+  font-size: 13px;
+}
+
+/* Charts within columns */
+.compact {
+  margin: 15px 0 0;
+  text-align: left;
+}
+
+/* Existing chart controls */
 .vega-bindings {
   margin-top: 12px;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .vega-bind {
@@ -92,11 +136,10 @@ h2 {
 .vega-bind select {
   max-width: 100%;
   padding: 5px;
-  font-family: inherit;
-  font-size: 14px;
+  font: inherit;
 }
 
-/* Author information */
+/* Footer */
 .footer {
   margin-top: 40px;
   padding-top: 20px;
@@ -106,6 +149,18 @@ h2 {
 
 .footer p {
   font-size: 12px;
+}
+
+/* Stack charts on narrower screens */
+@media (max-width: 1050px) {
+  .chart-row {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card h3,
+  .chart-card > .chart-note {
+    min-height: 0;
+  }
 }
 
 /* Smaller screens */
