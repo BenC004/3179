@@ -1,124 +1,488 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "$schema": "https://vega.github.io/schema/vega/v6.json",
+  "width": 700,
+  "height": 480,
+  "padding": 20,
   "title": {
-    "text": "Which states drove Malaysia's enrolment changes?",
-    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "text": "Do state averages hide differences in staffing across districts?",
+    "subtitle": [
+      "Students per teacher in government schools, 30 June 2025",
+      "Box = middle half of districts; central line = median.",
+      "Dashed line = Malaysia's overall students-per-teacher ratio."
+    ],
     "anchor": "start",
     "fontSize": 22,
-    "subtitleFontSize": 14
+    "subtitleFontSize": 13
   },
-  "width": 700,
-  "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
-  "transform": [
-    {"filter": "datum.state !== 'Malaysia'"},
-    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
-    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
-    {"calculate": "datum.Year === 2017 ? datum.students : 0", "as": "Baseline"},
-    {"calculate": "datum.Year === 2025 ? datum.students : 0", "as": "Latest"},
+  "signals": [
     {
-      "aggregate": [
-        {"op": "sum", "field": "Baseline", "as": "Students 2017"},
-        {"op": "sum", "field": "Latest", "as": "Students 2025"}
-      ],
-      "groupby": ["state"]
+      "name": "selectedStage",
+      "value": "primary",
+      "bind": {
+        "input": "select",
+        "name": "School stage: ",
+        "options": ["primary", "secondary"],
+        "labels": ["Primary", "Secondary"]
+      }
     },
-    {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
-    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
-    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
     {
-      "window": [
-        {"op": "sum", "field": "Change", "as": "Cumulative"},
-        {"op": "row_number", "as": "Order"}
-      ],
-      "sort": [
-        {"field": "Change", "order": "descending"},
-        {"field": "state", "order": "ascending"}
-      ],
-      "frame": [null, 0]
-    },
-    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
+      "name": "showDistricts",
+      "value": false,
+      "bind": {
+        "input": "checkbox",
+        "name": "Show every district "
+      }
+    }
+  ],
+  "data": [
     {
-      "joinaggregate": [
-        {"op": "sum", "field": "Change", "as": "National Net Change"},
-        {"op": "count", "as": "State Count"}
+      "name": "teacherRows",
+      "url": "../source1/teachers_district.csv",
+      "format": {
+        "type": "csv",
+        "parse": {"teachers": "number"}
+      },
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.date === '2025-06-30' && datum.sex === 'both' && datum.stage === selectedStage"
+        }
       ]
     },
-    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
-  ],
-  "layer": [
     {
-      "mark": {"type": "bar"},
-      "encoding": {
-        "x": {
-          "field": "State Label", "type": "nominal",
-          "sort": {"field": "Order", "op": "min", "order": "ascending"},
-          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
-          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
+      "name": "studentRows",
+      "url": "../source1/enrolment_school_district.csv",
+      "format": {
+        "type": "csv",
+        "parse": {"students": "number"}
+      },
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.date === '2025-06-30' && datum.sex === 'both' && datum.stage === selectedStage"
+        }
+      ]
+    },
+    {
+      "name": "districtTeachers",
+      "source": "teacherRows",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.district !== 'All Districts' && indexof(['Malaysia', 'Perlis', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'], datum.state) < 0"
         },
-        "y": {
-          "field": "Start", "type": "quantitative",
-          "scale": {"zero": true},
-          "axis": {
-            "title": "Cumulative enrolment change (students)",
-            "format": "~s",
-            "gridColor": "#EEEEEE"
+        {
+          "type": "formula",
+          "expr": "datum.state + '|' + datum.district + '|' + datum.stage + '|' + datum.date",
+          "as": "JoinKey"
+        }
+      ]
+    },
+    {
+      "name": "districtRatios",
+      "source": "studentRows",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.district !== 'All Districts' && indexof(['Malaysia', 'Perlis', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'], datum.state) < 0"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.state + '|' + datum.district + '|' + datum.stage + '|' + datum.date",
+          "as": "JoinKey"
+        },
+        {
+          "type": "lookup",
+          "from": "districtTeachers",
+          "key": "JoinKey",
+          "fields": ["JoinKey"],
+          "values": ["teachers"],
+          "as": ["Teachers"]
+        },
+        {
+          "type": "filter",
+          "expr": "isValid(datum.Teachers) && datum.Teachers > 0 && isValid(datum.students) && datum.students >= 0"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.students / datum.Teachers",
+          "as": "Ratio"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.stage === 'primary' ? 'Primary' : 'Secondary'",
+          "as": "Stage"
+        }
+      ]
+    },
+    {
+      "name": "summary",
+      "source": "districtRatios",
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["state"],
+          "fields": ["Ratio", "Ratio", "Ratio", "Ratio"],
+          "ops": ["q1", "median", "q3", "count"],
+          "as": ["Q1", "Median", "Q3", "DistrictCount"]
+        },
+        {
+          "type": "formula",
+          "expr": "datum.Q3 - datum.Q1",
+          "as": "IQR"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.Q1 - 1.5 * datum.IQR",
+          "as": "LowerFence"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.Q3 + 1.5 * datum.IQR",
+          "as": "UpperFence"
+        }
+      ]
+    },
+    {
+      "name": "classifiedDistricts",
+      "source": "districtRatios",
+      "transform": [
+        {
+          "type": "lookup",
+          "from": "summary",
+          "key": "state",
+          "fields": ["state"],
+          "values": ["LowerFence", "UpperFence"],
+          "as": ["LowerFence", "UpperFence"]
+        },
+        {
+          "type": "formula",
+          "expr": "datum.Ratio < datum.LowerFence || datum.Ratio > datum.UpperFence",
+          "as": "IsOutlier"
+        }
+      ]
+    },
+    {
+      "name": "whiskers",
+      "source": "classifiedDistricts",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "!datum.IsOutlier"
+        },
+        {
+          "type": "aggregate",
+          "groupby": ["state"],
+          "fields": ["Ratio", "Ratio"],
+          "ops": ["min", "max"],
+          "as": ["WhiskerLow", "WhiskerHigh"]
+        }
+      ]
+    },
+    {
+      "name": "boxes",
+      "source": "summary",
+      "transform": [
+        {
+          "type": "lookup",
+          "from": "whiskers",
+          "key": "state",
+          "fields": ["state"],
+          "values": ["WhiskerLow", "WhiskerHigh"],
+          "as": ["WhiskerLow", "WhiskerHigh"]
+        }
+      ]
+    },
+    {
+      "name": "visiblePoints",
+      "source": "classifiedDistricts",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "showDistricts || datum.IsOutlier"
+        }
+      ]
+    },
+    {
+      "name": "nationalTeachers",
+      "source": "teacherRows",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.state === 'Malaysia' && datum.district === 'All Districts'"
+        }
+      ]
+    },
+    {
+      "name": "national",
+      "source": "studentRows",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.state === 'Malaysia' && datum.district === 'All Districts'"
+        },
+        {
+          "type": "lookup",
+          "from": "nationalTeachers",
+          "key": "stage",
+          "fields": ["stage"],
+          "values": ["teachers"],
+          "as": ["Teachers"]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.Teachers > 0"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.students / datum.Teachers",
+          "as": "Ratio"
+        },
+        {
+          "type": "formula",
+          "expr": "'Malaysia: ' + format(datum.Ratio, '.1f')",
+          "as": "Label"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "linear",
+      "domain": [0, 20],
+      "range": "width",
+      "zero": true,
+      "nice": false
+    },
+    {
+      "name": "y",
+      "type": "band",
+      "domain": {
+        "data": "summary",
+        "field": "state",
+        "sort": true
+      },
+      "range": "height",
+      "paddingInner": 0.3,
+      "paddingOuter": 0.2
+    },
+    {
+      "name": "stageColour",
+      "type": "ordinal",
+      "domain": ["primary", "secondary"],
+      "range": ["#4E79A7", "#F28E2B"]
+    }
+  ],
+  "axes": [
+    {
+      "orient": "bottom",
+      "scale": "x",
+      "title": "Students per teacher",
+      "values": [0, 5, 10, 15, 20],
+      "format": ".0f",
+      "grid": true,
+      "gridColor": "#EEEEEE"
+    },
+    {
+      "orient": "left",
+      "scale": "y",
+      "title": null,
+      "ticks": false,
+      "domain": false,
+      "labelPadding": 10,
+      "labelLimit": 150
+    }
+  ],
+  "marks": [
+    {
+      "type": "rule",
+      "from": {"data": "national"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Ratio"},
+          "y": {"value": 0},
+          "y2": {"signal": "height"},
+          "stroke": {"value": "#666666"},
+          "strokeWidth": {"value": 1.5},
+          "strokeDash": {"value": [5, 5]},
+          "tooltip": {
+            "signal": "{'Location': 'Malaysia', 'Students': format(datum.students, ',.0f'), 'Teachers': format(datum.Teachers, ',.0f'), 'Students per teacher': format(datum.Ratio, '.2f')}"
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "national"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Ratio"},
+          "y": {"value": -8},
+          "dx": {"value": 5},
+          "text": {"field": "Label"},
+          "align": {"value": "left"},
+          "baseline": {"value": "bottom"},
+          "fontSize": {"value": 12},
+          "fill": {"value": "#555555"}
+        }
+      }
+    },
+    {
+      "type": "rule",
+      "interactive": false,
+      "from": {"data": "boxes"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "WhiskerLow"},
+          "x2": {"scale": "x", "field": "WhiskerHigh"},
+          "y": {
+            "signal": "scale('y', datum.state) + bandwidth('y') / 2"
+          },
+          "stroke": {
+            "signal": "scale('stageColour', selectedStage)"
+          },
+          "strokeWidth": {"value": 1.5}
+        }
+      }
+    },
+    {
+      "type": "rule",
+      "interactive": false,
+      "from": {"data": "boxes"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "WhiskerLow"},
+          "y": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.3"
+          },
+          "y2": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.7"
+          },
+          "stroke": {
+            "signal": "scale('stageColour', selectedStage)"
+          },
+          "strokeWidth": {"value": 1.5}
+        }
+      }
+    },
+    {
+      "type": "rule",
+      "interactive": false,
+      "from": {"data": "boxes"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "WhiskerHigh"},
+          "y": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.3"
+          },
+          "y2": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.7"
+          },
+          "stroke": {
+            "signal": "scale('stageColour', selectedStage)"
+          },
+          "strokeWidth": {"value": 1.5}
+        }
+      }
+    },
+    {
+      "type": "rect",
+      "from": {"data": "boxes"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Q1"},
+          "x2": {"scale": "x", "field": "Q3"},
+          "y": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.2"
+          },
+          "height": {
+            "signal": "bandwidth('y') * 0.6"
+          },
+          "fill": {
+            "signal": "scale('stageColour', selectedStage)"
+          },
+          "fillOpacity": {"value": 0.8},
+          "stroke": {
+            "signal": "scale('stageColour', selectedStage)"
+          },
+          "strokeWidth": {"value": 1},
+          "tooltip": {
+            "signal": "{'State': datum.state, 'School stage': selectedStage === 'primary' ? 'Primary' : 'Secondary', 'Districts': datum.DistrictCount, 'Lower quartile': format(datum.Q1, '.2f'), 'Median students per teacher': format(datum.Median, '.2f'), 'Upper quartile': format(datum.Q3, '.2f'), 'Lower whisker': format(datum.WhiskerLow, '.2f'), 'Upper whisker': format(datum.WhiskerHigh, '.2f')}"
           }
         },
-        "y2": {"field": "Cumulative"},
-        "color": {
-          "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
-          "legend": {"title": "Change direction", "orient": "right"}
+        "hover": {
+          "fillOpacity": {"value": 1},
+          "stroke": {"value": "#222222"},
+          "strokeWidth": {"value": 2}
+        }
+      }
+    },
+    {
+      "type": "rule",
+      "interactive": false,
+      "from": {"data": "boxes"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Median"},
+          "y": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.2"
+          },
+          "y2": {
+            "signal": "scale('y', datum.state) + bandwidth('y') * 0.8"
+          },
+          "stroke": {"value": "#222222"},
+          "strokeWidth": {"value": 2}
+        }
+      }
+    },
+    {
+      "type": "symbol",
+      "from": {"data": "visiblePoints"},
+      "encode": {
+        "update": {
+          "x": {"scale": "x", "field": "Ratio"},
+          "y": {
+            "signal": "scale('y', datum.state) + bandwidth('y') / 2"
+          },
+          "shape": {"value": "circle"},
+          "size": {
+            "signal": "datum.IsOutlier ? 65 : 30"
+          },
+          "fill": {
+            "signal": "datum.IsOutlier ? '#FFFFFF' : scale('stageColour', selectedStage)"
+          },
+          "fillOpacity": {
+            "signal": "datum.IsOutlier ? 1 : 0.45"
+          },
+          "stroke": {
+            "signal": "datum.IsOutlier ? scale('stageColour', selectedStage) : '#333333'"
+          },
+          "strokeWidth": {
+            "signal": "datum.IsOutlier ? 2 : 0.5"
+          },
+          "tooltip": {
+            "signal": "{'State': datum.state, 'Education district': datum.district, 'School stage': datum.Stage, 'Students': format(datum.students, ',.0f'), 'Teachers': format(datum.Teachers, ',.0f'), 'Students per teacher': format(datum.Ratio, '.2f'), 'Outside whiskers': datum.IsOutlier ? 'Yes' : 'No'}"
+          }
         },
-        "tooltip": [
-          {"field": "State Label", "type": "nominal", "title": "State"},
-          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
-          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
-          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
-          {"field": "Direction", "type": "nominal", "title": "Direction"}
-        ]
-      }
-    },
-    {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
-      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 390},
-        "text": {"field": "Net Label"}
-      }
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 415},
-        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
+        "hover": {
+          "size": {"value": 100},
+          "stroke": {"value": "#222222"},
+          "strokeWidth": {"value": 2},
+          "fillOpacity": {"value": 1}
+        }
       }
     }
   ],
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
     "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
+      "labelFontSize": 12,
+      "titleFontSize": 13,
+      "domain": false,
+      "tickColor": "#CCCCCC",
+      "titlePadding": 12
     }
   }
 }

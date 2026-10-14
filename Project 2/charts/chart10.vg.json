@@ -1,124 +1,450 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "$schema": "https://vega.github.io/schema/vega/v6.json",
+  "width": 800,
+  "height": 520,
+  "padding": 25,
   "title": {
-    "text": "Which states drove Malaysia's enrolment changes?",
-    "subtitle": "Change in government primary and secondary enrolment, 2017 - 2025",
+    "text": "How are schools distributed relative to student numbers?",
+    "subtitle": [
+      "Government primary and secondary schools by state, 2025",
+      "State shape area = school count; darker purple = more students per school.",
+      "Shapes are resized and separated; geographic positions are approximate."
+    ],
     "anchor": "start",
     "fontSize": 22,
-    "subtitleFontSize": 14
+    "subtitleFontSize": 13
   },
-  "width": 700,
-  "height": 500,
-  "data": {"url": "source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
-  "transform": [
-    {"filter": "datum.state !== 'Malaysia'"},
-    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
-    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year === 2017 || datum.Year === 2025"},
-    {"calculate": "datum.Year === 2017 ? datum.students : 0", "as": "Baseline"},
-    {"calculate": "datum.Year === 2025 ? datum.students : 0", "as": "Latest"},
+  "signals": [
     {
-      "aggregate": [
-        {"op": "sum", "field": "Baseline", "as": "Students 2017"},
-        {"op": "sum", "field": "Latest", "as": "Students 2025"}
-      ],
-      "groupby": ["state"]
-    },
-    {"calculate": "datum['Students 2025'] - datum['Students 2017']", "as": "Change"},
-    {"calculate": "datum.Change >= 0 ? 'Increase' : 'Decrease'", "as": "Direction"},
-    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
+      "name": "pixelsPerSchool",
+      "value": 3
+    }
+  ],
+  "projections": [
     {
-      "window": [
-        {"op": "sum", "field": "Change", "as": "Cumulative"},
-        {"op": "row_number", "as": "Order"}
-      ],
-      "sort": [
-        {"field": "Change", "order": "descending"},
-        {"field": "state", "order": "ascending"}
-      ],
-      "frame": [null, 0]
-    },
-    {"calculate": "datum.Cumulative - datum.Change", "as": "Start"},
+      "name": "outlineProjection",
+      "type": "mercator",
+      "scale": 1000,
+      "center": [109, 4],
+      "translate": [0, 0],
+      "precision": 0.1
+    }
+  ],
+  "data": [
     {
-      "joinaggregate": [
-        {"op": "sum", "field": "Change", "as": "National Net Change"},
-        {"op": "count", "as": "State Count"}
+      "name": "schoolTotals",
+      "url": "../source1/schools_district.csv",
+      "format": {
+        "type": "csv",
+        "parse": {"schools": "number"}
+      },
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.state !== 'Malaysia' && datum.district === 'All Districts'"
+        },
+        {
+          "type": "filter",
+          "expr": "datum.date === '2025-06-30' && (datum.stage === 'primary' || datum.stage === 'secondary')"
+        },
+        {
+          "type": "aggregate",
+          "groupby": ["state"],
+          "fields": ["schools"],
+          "ops": ["sum"],
+          "as": ["Schools"]
+        }
       ]
     },
-    {"calculate": "'National net change: ' + format(datum['National Net Change'], ',.0f') + ' students'", "as": "Net Label"}
-  ],
-  "layer": [
     {
-      "mark": {"type": "bar"},
-      "encoding": {
-        "x": {
-          "field": "State Label", "type": "nominal",
-          "sort": {"field": "Order", "op": "min", "order": "ascending"},
-          "scale": {"paddingInner": 0.22, "paddingOuter": 0.1},
-          "axis": {"title": null, "labelAngle": -90, "labelLimit": 150}
+      "name": "studentTotals",
+      "url": "../source1/enrolment_school_district.csv",
+      "format": {
+        "type": "csv",
+        "parse": {"students": "number"}
+      },
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.state !== 'Malaysia' && datum.district === 'All Districts' && datum.sex === 'both'"
         },
-        "y": {
-          "field": "Start", "type": "quantitative",
-          "scale": {"zero": true},
-          "axis": {
-            "title": "Cumulative enrolment change (students)",
-            "format": "~s",
-            "gridColor": "#EEEEEE"
+        {
+          "type": "filter",
+          "expr": "datum.date === '2025-06-30' && (datum.stage === 'primary' || datum.stage === 'secondary')"
+        },
+        {
+          "type": "aggregate",
+          "groupby": ["state"],
+          "fields": ["students"],
+          "ops": ["sum"],
+          "as": ["Students"]
+        }
+      ]
+    },
+    {
+      "name": "cartogram",
+      "url": "../maps/administrative_1_state.geojson",
+      "format": {
+        "type": "json",
+        "property": "features"
+      },
+      "transform": [
+        {
+          "type": "formula",
+          "expr": "datum.properties.state",
+          "as": "State"
+        },
+        {
+          "type": "lookup",
+          "from": "schoolTotals",
+          "key": "state",
+          "fields": ["State"],
+          "values": ["Schools"],
+          "as": ["Schools"]
+        },
+        {
+          "type": "lookup",
+          "from": "studentTotals",
+          "key": "state",
+          "fields": ["State"],
+          "values": ["Students"],
+          "as": ["Students"]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.Schools > 0 && isValid(datum.Students)"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.Students / datum.Schools",
+          "as": "StudentsPerSchool"
+        },
+        {
+          "type": "formula",
+          "expr": "geoArea('outlineProjection', datum)",
+          "as": "OriginalArea"
+        },
+        {
+          "type": "formula",
+          "expr": "geoCentroid('outlineProjection', datum)",
+          "as": "ProjectedCentre"
+        },
+        {
+          "type": "formula",
+          "expr": "geoCentroid(null, datum)",
+          "as": "GeographicCentre"
+        },
+        {
+          "type": "formula",
+          "expr": "geoBounds('outlineProjection', datum)",
+          "as": "Bounds"
+        },
+        {
+          "type": "filter",
+          "expr": "isValid(datum.OriginalArea) && datum.OriginalArea > 0"
+        },
+        {
+          "type": "formula",
+          "expr": "sqrt(datum.Schools * pixelsPerSchool / datum.OriginalArea)",
+          "as": "ScaleFactor"
+        },
+        {
+          "type": "formula",
+          "expr": "max(abs(datum.Bounds[0][0] - datum.ProjectedCentre[0]), abs(datum.Bounds[1][0] - datum.ProjectedCentre[0])) * datum.ScaleFactor",
+          "as": "HalfWidth"
+        },
+        {
+          "type": "formula",
+          "expr": "max(abs(datum.Bounds[0][1] - datum.ProjectedCentre[1]), abs(datum.Bounds[1][1] - datum.ProjectedCentre[1])) * datum.ScaleFactor",
+          "as": "HalfHeight"
+        },
+        {
+          "type": "formula",
+          "expr": "sqrt(datum.HalfWidth * datum.HalfWidth + datum.HalfHeight * datum.HalfHeight) + 8",
+          "as": "CollisionRadius"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.GeographicCentre[0] < 105 ? 90 + (datum.GeographicCentre[0] - 100) * 85 : 520 + (datum.GeographicCentre[0] - 112) * 35",
+          "as": "AnchorX"
+        },
+        {
+          "type": "formula",
+          "expr": "70 + (7 - datum.GeographicCentre[1]) * 65",
+          "as": "AnchorY"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.AnchorX",
+          "as": "x"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.AnchorY",
+          "as": "y"
+        },
+        {
+          "type": "formula",
+          "expr": "indexof(datum.State, 'W.P. ') === 0",
+          "as": "ExternalLabel"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.State === 'Pulau Pinang' ? 'Penang' : datum.State === 'Negeri Sembilan' ? 'N. Sembilan' : replace(datum.State, 'W.P. ', '')",
+          "as": "Label"
+        },
+        {
+          "type": "geopath",
+          "projection": "outlineProjection",
+          "as": "StatePath"
+        },
+        {
+          "type": "force",
+          "static": true,
+          "iterations": 600,
+          "forces": [
+            {
+              "force": "x",
+              "x": "AnchorX",
+              "strength": 0.08
+            },
+            {
+              "force": "y",
+              "y": "AnchorY",
+              "strength": 0.08
+            },
+            {
+              "force": "collide",
+              "radius": {"expr": "datum.CollisionRadius"},
+              "strength": 1,
+              "iterations": 5
+            }
+          ]
+        },
+        {
+          "type": "formula",
+          "expr": "datum.x - datum.ProjectedCentre[0] * datum.ScaleFactor",
+          "as": "DrawX"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.y - datum.ProjectedCentre[1] * datum.ScaleFactor",
+          "as": "DrawY"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.State === 'W.P. Labuan' ? 1 : -1",
+          "as": "LabelDirection"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.x + datum.LabelDirection * (datum.CollisionRadius + 18)",
+          "as": "LabelX"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.y + (datum.State === 'W.P. Putrajaya' ? 16 : -12)",
+          "as": "LabelY"
+        }
+      ]
+    },
+    {
+      "name": "internalLabels",
+      "source": "cartogram",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "!datum.ExternalLabel"
+        }
+      ]
+    },
+    {
+      "name": "externalLabels",
+      "source": "cartogram",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.ExternalLabel"
+        }
+      ]
+    },
+    {
+      "name": "regions",
+      "values": [
+        {"label": "Peninsular Malaysia", "x": 240},
+        {"label": "East Malaysia", "x": 640}
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "ratioColour",
+      "type": "linear",
+      "domain": {
+        "data": "cartogram",
+        "field": "StudentsPerSchool"
+      },
+      "range": ["#F2EDF8", "#54278F"],
+      "zero": false,
+      "nice": false
+    },
+    {
+      "name": "schoolArea",
+      "type": "linear",
+      "domain": [0, 1000],
+      "range": [0, {"signal": "1000 * pixelsPerSchool"}],
+      "zero": true
+    }
+  ],
+  "legends": [
+    {
+      "fill": "ratioColour",
+      "title": "Students per school",
+      "orient": "bottom",
+      "direction": "horizontal",
+      "gradientLength": 280,
+      "format": ",.0f"
+    },
+    {
+      "size": "schoolArea",
+      "title": "Schools: equal-area reference squares",
+      "orient": "right",
+      "values": [100, 500, 1000],
+      "format": ",.0f",
+      "symbolType": "square",
+      "symbolFillColor": "#DDDDDD",
+      "symbolStrokeColor": "#777777"
+    }
+  ],
+  "marks": [
+    {
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "regions"},
+      "encode": {
+        "update": {
+          "x": {"field": "x"},
+          "y": {"value": 15},
+          "text": {"field": "label"},
+          "align": {"value": "center"},
+          "fontSize": {"value": 14},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#555555"}
+        }
+      }
+    },
+    {
+      "type": "path",
+      "from": {"data": "cartogram"},
+      "encode": {
+        "update": {
+          "path": {"field": "StatePath"},
+          "x": {"field": "DrawX"},
+          "y": {"field": "DrawY"},
+          "scaleX": {"field": "ScaleFactor"},
+          "scaleY": {"field": "ScaleFactor"},
+          "fill": {
+            "scale": "ratioColour",
+            "field": "StudentsPerSchool"
+          },
+          "stroke": {"value": "#777777"},
+          "strokeWidth": {
+            "signal": "0.7 / datum.ScaleFactor"
+          },
+          "strokeJoin": {"value": "round"},
+          "tooltip": {
+            "signal": "{'State': datum.State, 'Year': 2025, 'Schools': format(datum.Schools, ',.0f'), 'Students': format(datum.Students, ',.0f'), 'Students per school': format(datum.StudentsPerSchool, ',.1f')}"
           }
         },
-        "y2": {"field": "Cumulative"},
-        "color": {
-          "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
-          "legend": {"title": "Change direction", "orient": "right"}
-        },
-        "tooltip": [
-          {"field": "State Label", "type": "nominal", "title": "State"},
-          {"field": "Students 2017", "type": "quantitative", "title": "Students in 2017", "format": ",.0f"},
-          {"field": "Students 2025", "type": "quantitative", "title": "Students in 2025", "format": ",.0f"},
-          {"field": "Change", "type": "quantitative", "title": "Enrolment change", "format": "+,.0f"},
-          {"field": "Direction", "type": "nominal", "title": "Direction"}
-        ]
+        "hover": {
+          "stroke": {"value": "#222222"},
+          "strokeWidth": {
+            "signal": "2 / datum.ScaleFactor"
+          }
+        }
       }
     },
     {
-      "data": {"values": [{}]},
-      "mark": {"type": "rule", "color": "#888888", "strokeDash": [3, 3]},
-      "encoding": {"y": {"datum": 0, "type": "quantitative"}}
-    },
-    {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 14, "fontWeight": "bold", "color": "#222222"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 390},
-        "text": {"field": "Net Label"}
+      "type": "rule",
+      "interactive": false,
+      "from": {"data": "externalLabels"},
+      "encode": {
+        "update": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "x2": {"field": "LabelX"},
+          "y2": {"field": "LabelY"},
+          "stroke": {"value": "#777777"},
+          "strokeWidth": {"value": 1}
+        }
       }
     },
     {
-      "transform": [{"filter": "datum.Order === datum['State Count']"}],
-      "mark": {
-        "type": "text", "align": "left", "baseline": "top",
-        "fontSize": 13, "lineBreak": "\n", "lineHeight": 18,
-        "color": "#444444"
-      },
-      "encoding": {
-        "x": {"value": 290},
-        "y": {"value": 415},
-        "text": {"value": "Increases in some states were offset\nby declines elsewhere."}
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "internalLabels"},
+      "encode": {
+        "update": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "text": {"field": "Label"},
+          "align": {"value": "center"},
+          "baseline": {"value": "middle"},
+          "fontSize": {"value": 11},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#FFFFFF"},
+          "stroke": {"value": "#FFFFFF"},
+          "strokeWidth": {"value": 3}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "internalLabels"},
+      "encode": {
+        "update": {
+          "x": {"field": "x"},
+          "y": {"field": "y"},
+          "text": {"field": "Label"},
+          "align": {"value": "center"},
+          "baseline": {"value": "middle"},
+          "fontSize": {"value": 11},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#222222"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": {"data": "externalLabels"},
+      "encode": {
+        "update": {
+          "x": {"field": "LabelX"},
+          "y": {"field": "LabelY"},
+          "text": {"field": "Label"},
+          "align": {
+            "signal": "datum.LabelDirection > 0 ? 'left' : 'right'"
+          },
+          "baseline": {"value": "middle"},
+          "dx": {
+            "signal": "datum.LabelDirection * 4"
+          },
+          "fontSize": {"value": 11},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#222222"},
+          "tooltip": {
+            "signal": "{'State': datum.State, 'Schools': format(datum.Schools, ',.0f'), 'Students': format(datum.Students, ',.0f'), 'Students per school': format(datum.StudentsPerSchool, ',.1f')}"
+          }
+        }
       }
     }
   ],
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 11, "titleFontSize": 13,
-      "domain": false, "tickColor": "#CCCCCC"
+    "legend": {
+      "labelFontSize": 12,
+      "titleFontSize": 13
     }
   }
 }
