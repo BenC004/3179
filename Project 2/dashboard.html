@@ -7,203 +7,25 @@
 
   <title>Malaysia's Changing Classrooms</title>
 
-  <!-- Chart libraries -->
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
 
-  <!-- All CSS is included here -->
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #f2f1ed;
-      color: #263238;
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.6;
-    }
-
-    .page {
-      width: calc(100% - 40px);
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 30px;
-      background: white;
-    }
-
-    h1 {
-      margin: 0 0 12px;
-      font-family: Georgia, serif;
-      font-size: 40px;
-      line-height: 1.2;
-    }
-
-    .subtitle {
-      font-size: 20px;
-      font-weight: bold;
-      color: #607078;
-      margin-bottom: 24px;
-    }
-
-    p {
-      max-width: 60ch;
-      margin: 0 0 16px;
-      font-size: 16px;
-    }
-
-    .section {
-      margin-top: 40px;
-      padding-top: 25px;
-      border-top: 1px solid #dddddd;
-    }
-
-    .section-label {
-      font-size: 12px;
-      font-weight: bold;
-      color: #80654d;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    h2 {
-      margin: 0 0 16px;
-      font-size: 26px;
-      line-height: 1.3;
-    }
-
-    h3 {
-      margin: 0 0 12px;
-      font-size: 19px;
-      line-height: 1.3;
-    }
-
-    /* Two charts side by side */
-    .chart-row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 28px;
-      margin: 25px 0 40px;
-      align-items: start;
-    }
-
-    .chart-card {
-      min-width: 0;
-    }
-
-    .chart-card h3 {
-      min-height: 50px;
-    }
-
-    .chart-card > .chart-note {
-      min-height: 66px;
-    }
-
-    .chart-note {
-      font-size: 13px;
-      color: #607078;
-    }
-
-    /* Standalone charts remain centred at their natural size */
-    .chart {
-      max-width: 100%;
-      margin: 25px 0 40px;
-      overflow-x: auto;
-      text-align: center;
-    }
-
-    .chart .vega-embed {
-      display: inline-block;
-      width: auto;
-      max-width: 100%;
-      text-align: left;
-    }
-
-    /* Do not stretch chart images */
-    .chart svg {
-      width: auto;
-      height: auto;
-    }
-
-    .compact {
-      margin: 15px 0 0;
-      text-align: left;
-    }
-
-    .vega-bindings {
-      margin-top: 12px;
-      font-size: 13px;
-    }
-
-    .vega-bind {
-      margin-bottom: 8px;
-    }
-
-    .vega-bind select {
-      max-width: 100%;
-      padding: 5px;
-      font: inherit;
-    }
-
-    .footer {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid #dddddd;
-      color: #666666;
-    }
-
-    .footer p {
-      font-size: 12px;
-    }
-
-    /* Stack charts on narrower screens */
-    @media (max-width: 1050px) {
-      .chart-row {
-        grid-template-columns: 1fr;
-      }
-
-      .chart-card h3,
-      .chart-card > .chart-note {
-        min-height: 0;
-      }
-
-      .compact {
-        text-align: center;
-      }
-    }
-
-    @media (max-width: 700px) {
-      .page {
-        width: calc(100% - 20px);
-        margin: 10px auto;
-        padding: 20px;
-      }
-
-      h1 {
-        font-size: 30px;
-      }
-
-      h2 {
-        font-size: 23px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
   <div class="page">
 
-    <!-- INTRODUCTION -->
+    <!-- TITLE -->
+    <div class="title-banner">
+      <h1>Malaysia's Changing Classrooms</h1>
 
-    <h1>Malaysia's Changing Classrooms</h1>
-
-    <p class="subtitle">
-      Student enrolment, demographics, schools and teachers
-    </p>
+      <p class="subtitle">
+        Student enrolment, demographics, schools and teachers
+      </p>
+    </div>
 
     <p>
       Malaysia's student numbers look stable nationally,
@@ -217,40 +39,68 @@
     </p>
 
     <!-- SECTION 1 -->
-
     <div class="section">
 
-      <p class="section-label">Part 1 — Enrolment trends</p>
-
-      <h2>How have student numbers changed over time?</h2>
+      <div class="section-heading">
+        <p class="section-label">Part 1 — Enrolment trends</p>
+        <h2>How have student numbers changed over time?</h2>
+      </div>
 
       <p>
         A stable national total can conceal different
         trends in primary and secondary enrolment.
       </p>
 
-      <!-- Chart 1: standalone -->
-      <div id="chart1" class="chart"></div>
+      <div class="chart-story">
+
+        <div id="chart1" class="chart"></div>
+
+        <div class="insight">
+          <h4>National context</h4>
+          <p>
+            Malaysia's primary enrolment increased by
+            <strong>2.4%</strong> from 2017 to 2025,
+            while secondary enrolment fell by
+            <strong>3.2%</strong>.
+            Together, they changed by only
+            <strong>−0.09%</strong>.
+          </p>
+        </div>
+
+      </div>
 
     </div>
 
     <!-- SECTION 2 -->
-
     <div class="section">
 
-      <p class="section-label">Part 2 — State differences</p>
-
-      <h2>Where are enrolments growing or declining?</h2>
+      <div class="section-heading">
+        <p class="section-label">Part 2 — State differences</p>
+        <h2>Where are enrolments growing or declining?</h2>
+      </div>
 
       <p>
         Compare state contributions, percentage changes,
         student concentration and annual enrolment patterns.
       </p>
 
-      <!-- Chart 2: standalone waterfall -->
-      <div id="chart2" class="chart"></div>
+      <div class="chart-story">
 
-      <!-- Charts 3 and 4: side by side -->
+        <div id="chart2" class="chart"></div>
+
+        <div class="insight">
+          <h4>Growth and decline offset one another</h4>
+          <p>
+            Selangor added <strong>51,626 students</strong>
+            between 2017 and 2025. Sarawak lost
+            <strong>43,214</strong>.
+            The national net change was much smaller:
+            a decline of <strong>4,537 students</strong>.
+          </p>
+        </div>
+
+      </div>
+
       <div class="chart-row">
 
         <div class="chart-card">
@@ -262,6 +112,17 @@
           </p>
 
           <div id="chart3" class="chart compact"></div>
+
+          <div class="insight">
+            <h4>A large percentage from a small base</h4>
+            <p>
+              Putrajaya's combined enrolment grew by
+              <strong>71.6%</strong>, compared with
+              <strong>5.8%</strong> in Selangor.
+              Percentage growth and the number of
+              additional students answer different questions.
+            </p>
+          </div>
         </div>
 
         <div class="chart-card">
@@ -273,22 +134,47 @@
           </p>
 
           <div id="chart4" class="chart compact"></div>
+
+          <div class="insight">
+            <h4>One in five students</h4>
+            <p>
+              Selangor accounted for approximately
+              <strong>19.5%</strong> of Malaysia's government
+              primary and secondary enrolment in 2025—the
+              largest share among states and territories.
+            </p>
+          </div>
         </div>
 
       </div>
 
-      <!-- Chart 5: standalone heatmap -->
-      <div id="chart5" class="chart"></div>
+      <div class="chart-story">
+
+        <div id="chart5" class="chart"></div>
+
+        <div class="insight">
+          <h4>Timing matters</h4>
+          <p>
+            Perlis recorded a <strong>24.7% fall</strong>
+            in combined enrolment in 2018.
+            Later gains left its 2025 total
+            <strong>18.0% below 2017</strong>.
+            The colour cap means the 2018 decline looks
+            similar to smaller declines.
+          </p>
+        </div>
+
+      </div>
 
     </div>
 
     <!-- SECTION 3 -->
-
     <div class="section">
 
-      <p class="section-label">Part 3 — Demographics</p>
-
-      <h2>How do gender and demographic patterns differ?</h2>
+      <div class="section-heading">
+        <p class="section-label">Part 3 — Demographics</p>
+        <h2>How do gender and demographic patterns differ?</h2>
+      </div>
 
       <p>
         Student composition, the young population and births
@@ -296,7 +182,6 @@
         school demand.
       </p>
 
-      <!-- Charts 6 and 9: side by side -->
       <div class="chart-row">
 
         <div class="chart-card">
@@ -309,6 +194,17 @@
           </p>
 
           <div id="chart6" class="chart compact"></div>
+
+          <div class="insight">
+            <h4>National context</h4>
+            <p>
+              In Malaysia in 2025, girls represented
+              <strong>48.7%</strong> of primary students
+              and <strong>49.4%</strong> of secondary students.
+              Primary education accounted for
+              <strong>57.1%</strong> of combined enrolment.
+            </p>
+          </div>
         </div>
 
         <div class="chart-card">
@@ -320,25 +216,63 @@
           </p>
 
           <div id="chart9" class="chart compact"></div>
+
+          <div class="insight">
+            <h4>National context</h4>
+            <p>
+              Malaysia recorded <strong>414,918 births</strong>
+              in 2024, <strong>18.4% fewer</strong> than in 2017.
+              Births rebounded in 2023 before falling again
+              in 2024.
+            </p>
+          </div>
         </div>
 
       </div>
 
-      <!-- Chart 7: standalone parallel coordinates -->
-      <div id="chart7" class="chart"></div>
+      <div class="chart-story">
 
-      <!-- Chart 8: standalone population pyramid -->
-      <div id="chart8" class="chart"></div>
+        <div id="chart7" class="chart"></div>
+
+        <div class="insight">
+          <h4>Read across each profile</h4>
+          <p>
+            Each connected line represents one state across
+            three different growth measures.
+            It is not a timeline.
+            Differences between the axes show how population
+            and enrolment changes diverge.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="chart-story">
+
+        <div id="chart8" class="chart"></div>
+
+        <div class="insight">
+          <h4>National context</h4>
+          <p>
+            Malaysia's population aged 0–4 fell from about
+            <strong>2.61 million</strong> in 2017 to
+            <strong>2.26 million</strong> in 2025.
+            The youngest cohort became smaller even as
+            primary enrolment increased.
+          </p>
+        </div>
+
+      </div>
 
     </div>
 
     <!-- SECTION 4 -->
-
     <div class="section">
 
-      <p class="section-label">Part 4 — Schools and teachers</p>
-
-      <h2>Are schools and teachers keeping pace?</h2>
+      <div class="section-heading">
+        <p class="section-label">Part 4 — Schools and teachers</p>
+        <h2>Are schools and teachers keeping pace?</h2>
+      </div>
 
       <p>
         Compare school provision with student numbers,
@@ -346,10 +280,20 @@
         differences across districts.
       </p>
 
-      <!-- Chart 10: standalone cartogram -->
       <div id="chart10" class="chart"></div>
 
-      <!-- Charts 11 and 12: side by side -->
+      <div class="insight">
+        <h4>More schools does not mean more students per school</h4>
+        <p>
+          In 2025, Sarawak had <strong>1,460</strong> government
+          primary and secondary schools, averaging about
+          <strong>277 students per school</strong>.
+          Selangor had <strong>945</strong>, averaging about
+          <strong>995</strong>.
+          These are school-level averages, not classroom sizes.
+        </p>
+      </div>
+
       <div class="chart-row">
 
         <div class="chart-card">
@@ -362,6 +306,18 @@
           </p>
 
           <div id="chart11" class="chart compact"></div>
+
+          <div class="insight">
+            <h4>National context</h4>
+            <p>
+              From 2017 to 2025, primary teacher numbers rose
+              by <strong>2.8%</strong>, close to enrolment
+              growth of <strong>2.4%</strong>.
+              Secondary teacher numbers fell by
+              <strong>0.6%</strong>, compared with a
+              <strong>3.2%</strong> enrolment decline.
+            </p>
+          </div>
         </div>
 
         <div class="chart-card">
@@ -374,29 +330,56 @@
           </p>
 
           <div id="chart12" class="chart compact"></div>
+
+          <div class="insight">
+            <h4>Within-state differences</h4>
+            <p>
+              For primary education in 2025, Selangor's
+              median district ratio was about
+              <strong>15.5 students per teacher</strong>,
+              compared with <strong>6.8</strong> in Sarawak.
+              Malaysia's overall ratio was
+              <strong>11.6</strong>.
+              Ratios do not directly measure class size.
+            </p>
+          </div>
         </div>
 
       </div>
 
-      <p class="chart-note">
-        Chart 12 covers 140 education reporting districts
-        across 12 states. Perlis and federal territories
-        are excluded from the boxes but included in the
-        national ratio. Hollow circles are outside the
-        whiskers. Students per teacher is not classroom size.
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+      <p><strong>Data Sources:</strong></p>
+
+      <div class="source-entry">
+        <strong>1. Education Data</strong>
+        <p class="source-citation">
+          Ministry of Education Malaysia,
+          <em>Student Enrolment, Schools and Teachers by District</em>,
+          2017–2025.
+        </p>
+      </div>
+
+      <div class="source-entry">
+        <strong>2. Population and Birth Data</strong>
+        <p class="source-citation">
+          Department of Statistics Malaysia (DOSM),
+          <em>State Population and Annual Live Births</em>.
+          Population: 2017 and 2025; births: 2017–2024.
+        </p>
+      </div>
+
+      <p class="author-credit">
+        A visualization by Ben Chong Wei Heng |
+        34860398 | October 2026
       </p>
 
     </div>
 
-    <!-- FOOTER -->
-
-    <div class="footer">
-      <p>Author: Ben Chong Wei Heng | October 2026</p>
-    </div>
-
   </div>
-
-  <!-- CHART EMBEDDING -->
 
   <script type="text/javascript">
 
@@ -410,14 +393,15 @@
         baseURL: chartFolder
       },
       actions: false,
-      renderer: "svg"
+      renderer: "svg",
+
+      patch: function (spec) {
+        spec.background = null;
+        return spec;
+      }
     };
 
-    /*
-      Standalone charts use their original JSON dimensions.
-      CSS centres them without stretching.
-    */
-
+    // Standalone charts.
     var spec1 = chartFolder + "chart1.vg.json";
     vegaEmbed("#chart1", spec1, chartOptions)
       .catch(console.error);
@@ -442,11 +426,7 @@
     vegaEmbed("#chart10", spec10, chartOptions)
       .catch(console.error);
 
-    /*
-      Paired charts receive smaller plot dimensions.
-      Saved JSON files are not modified.
-    */
-
+    // Paired charts.
     async function embedCompact(id) {
       var container = document.querySelector("#chart" + id);
 
@@ -461,13 +441,11 @@
 
         var spec = await response.json();
 
-        // Limit width even when charts stack on smaller screens.
         var availableWidth = Math.min(
           container.clientWidth,
           540
         );
 
-        // Paired chart headings and notes are already in the HTML.
         delete spec.title;
 
         if (id === 3 || id === 4) {
@@ -477,8 +455,6 @@
         } else if (id === 6) {
           spec.width = Math.max(220, availableWidth - 80);
           spec.height = 300;
-
-          // Keep the stage labels beneath the resized mosaic.
           spec.layer[2].encoding.y.value = 315;
 
         } else if (id === 9) {
@@ -494,7 +470,6 @@
           spec.height = 400;
         }
 
-        // Move Vega-Lite legends below the paired plots.
         function moveLegends(node) {
           if (!node || typeof node !== "object") return;
 
@@ -510,7 +485,6 @@
             node.legend.orient = "bottom";
             node.legend.direction = "horizontal";
 
-            // Wrap the student-count legend beneath chart 4.
             if (id === 4) {
               node.legend.columns = 2;
             }
@@ -523,7 +497,6 @@
           moveLegends(spec);
         }
 
-        // Chart 11 uses Vega's top-level legend definition.
         if (id === 11 && spec.legends) {
           spec.legends.forEach(function (legend) {
             legend.orient = "bottom";
@@ -531,11 +504,7 @@
           });
         }
 
-        await vegaEmbed(
-          container,
-          spec,
-          chartOptions
-        );
+        await vegaEmbed(container, spec, chartOptions);
 
       } catch (error) {
         console.error("Chart " + id + ":", error);
@@ -545,7 +514,6 @@
       }
     }
 
-    // Load the paired charts.
     embedCompact(3);
     embedCompact(4);
     embedCompact(6);
