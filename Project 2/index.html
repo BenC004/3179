@@ -63,7 +63,7 @@
             while secondary enrolment fell by
             <strong>3.2%</strong>.
             Together, they changed by only
-            <strong>−0.09%</strong>.
+            <strong>-0.09%</strong>.
           </p>
         </div>
 
@@ -104,13 +104,6 @@
       <div class="chart-row">
 
         <div class="chart-card">
-          <h3>Where did enrolment grow or decline?</h3>
-
-          <p class="chart-note">
-            Combined enrolment change, 2017–2025.
-            Colours capped at ±20%; hover for exact values.
-          </p>
-
           <div id="chart3" class="chart compact"></div>
 
           <div class="insight">
@@ -126,13 +119,6 @@
         </div>
 
         <div class="chart-card">
-          <h3>Where are students concentrated?</h3>
-
-          <p class="chart-note">
-            Government primary and secondary enrolment, 2025.
-            Circle area represents student numbers.
-          </p>
-
           <div id="chart4" class="chart compact"></div>
 
           <div class="insight">
@@ -185,14 +171,6 @@
       <div class="chart-row">
 
         <div class="chart-card">
-          <h3>Who are today's students?</h3>
-
-          <p class="chart-note">
-            Enrolment by school stage and sex, 2025.
-            Width shows stage share; height shows sex
-            share within each stage.
-          </p>
-
           <div id="chart6" class="chart compact"></div>
 
           <div class="insight">
@@ -208,13 +186,6 @@
         </div>
 
         <div class="chart-card">
-          <h3>How are future cohorts changing?</h3>
-
-          <p class="chart-note">
-            Registered live births, 2017–2024.
-            Births provide context for future school demand.
-          </p>
-
           <div id="chart9" class="chart compact"></div>
 
           <div class="insight">
@@ -227,7 +198,7 @@
             </p>
           </div>
         </div>
-
+        
       </div>
 
       <div class="chart-story">
@@ -254,7 +225,7 @@
         <div class="insight">
           <h4>National context</h4>
           <p>
-            Malaysia's population aged 0–4 fell from about
+            Malaysia's population aged 0 - 4 fell from about
             <strong>2.61 million</strong> in 2017 to
             <strong>2.26 million</strong> in 2025.
             The youngest cohort became smaller even as
@@ -297,14 +268,6 @@
       <div class="chart-row">
 
         <div class="chart-card">
-          <h3>Are teacher numbers keeping pace?</h3>
-
-          <p class="chart-note">
-            Changes, 2017–2025. Above the diagonal,
-            teacher growth exceeds enrolment growth;
-            below it, enrolment grows faster.
-          </p>
-
           <div id="chart11" class="chart compact"></div>
 
           <div class="insight">
@@ -321,14 +284,6 @@
         </div>
 
         <div class="chart-card">
-          <h3>How does staffing vary within states?</h3>
-
-          <p class="chart-note">
-            District students per teacher, June 2025.
-            Box = middle half; line = median;
-            dashed line = national ratio.
-          </p>
-
           <div id="chart12" class="chart compact"></div>
 
           <div class="insight">
@@ -359,7 +314,7 @@
         <p class="source-citation">
           Ministry of Education Malaysia,
           <em>Student Enrolment, Schools and Teachers by District</em>,
-          2017–2025.
+          2017 - 2025.
         </p>
       </div>
 
@@ -368,7 +323,7 @@
         <p class="source-citation">
           Department of Statistics Malaysia (DOSM),
           <em>State Population and Annual Live Births</em>.
-          Population: 2017 and 2025; births: 2017–2024.
+          Population: 2017 and 2025; births: 2017 - 2024.
         </p>
       </div>
 
@@ -426,7 +381,7 @@
     vegaEmbed("#chart10", spec10, chartOptions)
       .catch(console.error);
 
-    // Paired charts.
+    // Load and resize charts for the two-column layout.
     async function embedCompact(id) {
       var container = document.querySelector("#chart" + id);
 
@@ -446,7 +401,7 @@
           540
         );
 
-        delete spec.title;
+        // Keep the original title and subtitle from the JSON.
 
         if (id === 3 || id === 4) {
           spec.width = Math.max(240, availableWidth - 20);
@@ -455,6 +410,8 @@
         } else if (id === 6) {
           spec.width = Math.max(220, availableWidth - 80);
           spec.height = 300;
+
+          // Position the stage labels below the resized mosaic.
           spec.layer[2].encoding.y.value = 315;
 
         } else if (id === 9) {
@@ -470,8 +427,11 @@
           spec.height = 400;
         }
 
+        // Move Vega-Lite legends below the charts.
         function moveLegends(node) {
-          if (!node || typeof node !== "object") return;
+          if (!node || typeof node !== "object") {
+            return;
+          }
 
           if (Array.isArray(node)) {
             node.forEach(moveLegends);
@@ -497,6 +457,7 @@
           moveLegends(spec);
         }
 
+        // Chart 11 uses Vega's top-level legends array.
         if (id === 11 && spec.legends) {
           spec.legends.forEach(function (legend) {
             legend.orient = "bottom";
@@ -514,12 +475,13 @@
       }
     }
 
-    embedCompact(3);
-    embedCompact(4);
-    embedCompact(6);
-    embedCompact(9);
-    embedCompact(11);
-    embedCompact(12);
+// Display the six paired charts.
+embedCompact(3);
+embedCompact(4);
+embedCompact(6);
+embedCompact(9);
+embedCompact(11);
+embedCompact(12);
 
   </script>
 
