@@ -304,16 +304,6 @@
       "direction": "horizontal",
       "gradientLength": 280,
       "format": ",.0f"
-    },
-    {
-      "size": "schoolArea",
-      "title": "Schools: equal-area reference squares",
-      "orient": "right",
-      "values": [100, 500, 1000],
-      "format": ",.0f",
-      "symbolType": "square",
-      "symbolFillColor": "#DDDDDD",
-      "symbolStrokeColor": "#777777"
     }
   ],
   "marks": [
