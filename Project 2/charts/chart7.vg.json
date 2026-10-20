@@ -2,7 +2,7 @@
   "$schema": "https://vega.github.io/schema/vega/v6.json",
   "description": "Parallel coordinates comparing demographic and school enrolment changes by state.",
   "width": 800,
-  "height": 500,
+  "height": 400,
   "padding": 20,
   "title": {
     "text": "Do enrolment changes follow the child-population trend?",

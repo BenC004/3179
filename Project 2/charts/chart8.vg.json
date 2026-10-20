@@ -63,7 +63,7 @@
   "spacing": 40,
   "spec": {
     "width": 350,
-    "height": 450,
+    "height": 400,
     "encoding": {
       "x": {
         "field": "Signed Population", "type": "quantitative",
