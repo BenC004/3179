@@ -442,9 +442,6 @@
   ],
   "config": {
     "font": "Arial",
-    "legend": {
-      "labelFontSize": 12,
-      "titleFontSize": 13
-    }
+    "legend": {"labelFontSize": 12, "titleFontSize": 13}
   }
 }

@@ -6,7 +6,7 @@
   "title": {
     "text": "Is teacher growth keeping pace with enrolment growth?",
     "subtitle": [
-      "Percentage change in government schools, 2017–2025",
+      "Percentage change in government schools, 2017 - 2025",
       "Above the diagonal: teacher growth exceeds enrolment growth.",
       "Below the diagonal: enrolment growth exceeds teacher growth."
     ],
@@ -266,7 +266,7 @@
     {
       "orient": "bottom",
       "scale": "x",
-      "title": "Enrolment change, 2017–2025",
+      "title": "Enrolment change, 2017 - 2025",
       "format": ".0%",
       "grid": true,
       "gridColor": "#EEEEEE",
@@ -275,7 +275,7 @@
     {
       "orient": "left",
       "scale": "y",
-      "title": "Teacher change, 2017–2025",
+      "title": "Teacher change, 2017 - 2025",
       "format": ".0%",
       "grid": true,
       "gridColor": "#EEEEEE",

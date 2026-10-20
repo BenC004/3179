@@ -3,24 +3,16 @@
   "width": 700,
   "height": 400,
   "title": {
-    "text": {
-      "expr": "'How have annual births changed in ' + replace(selectedState, 'W.P. ', '') + '?'"
-    },
+    "text": {"expr": "'How have annual births changed in ' + replace(selectedState, 'W.P. ', '') + '?'"},
     "subtitle": [
-      "Registered live births, 2017–2024",
+      "Registered live births, 2017 - 2024",
       "Births indicate future school demand, rather than current enrolment."
     ],
     "anchor": "start",
     "fontSize": 22,
     "subtitleFontSize": 13
   },
-  "data": {
-    "url": "../source2/birth_state.csv",
-    "format": {
-      "type": "csv",
-      "parse": {"abs": "number"}
-    }
-  },
+  "data": {"url": "../source2/birth_state.csv", "format": {"type": "csv", "parse": {"abs": "number"}}},
   "params": [
     {
       "name": "selectedState",
@@ -29,48 +21,27 @@
         "input": "select",
         "name": "Selected location: ",
         "options": [
-          "Malaysia",
-          "Johor",
-          "Kedah",
-          "Kelantan",
-          "Melaka",
-          "Negeri Sembilan",
-          "Pahang",
-          "Perak",
-          "Perlis",
-          "Pulau Pinang",
-          "Sabah",
-          "Sarawak",
-          "Selangor",
-          "Terengganu",
-          "W.P. Kuala Lumpur",
-          "W.P. Labuan",
-          "W.P. Putrajaya"
+          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
+          "Selangor", "Terengganu", "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+        ],
+        "labels": [
+          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
+          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
+          "Selangor", "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
         ]
       }
     }
   ],
   "transform": [
+    {"filter": "selectedState === 'Malaysia' || datum.state === selectedState"},
+    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
+    {"filter": "datum.Year >= 2017 && datum.Year <= 2024"},
     {
-      "filter": "selectedState === 'Malaysia' || datum.state === selectedState"
-    },
-    {
-      "calculate": "toNumber(substring(datum.date, 0, 4))",
-      "as": "Year"
-    },
-    {
-      "filter": "datum.Year >= 2017 && datum.Year <= 2024"
-    },
-    {
-      "aggregate": [
-        {"op": "sum", "field": "abs", "as": "Births"}
-      ],
+      "aggregate": [{"op": "sum", "field": "abs", "as": "Births"}],
       "groupby": ["Year"]
     },
-    {
-      "calculate": "replace(selectedState, 'W.P. ', '')",
-      "as": "Location"
-    }
+    {"calculate": "replace(selectedState, 'W.P. ', '')", "as": "Location"}
   ],
   "encoding": {
     "x": {
@@ -96,65 +67,27 @@
     },
     "tooltip": [
       {"field": "Location", "type": "nominal"},
-      {
-        "field": "Year",
-        "type": "quantitative",
-        "format": "d"
-      },
-      {
-        "field": "Births",
-        "type": "quantitative",
-        "title": "Live births",
-        "format": ",.0f"
-      }
+      {"field": "Year", "type": "quantitative", "format": "d"},
+      {"field": "Births", "type": "quantitative", "title": "Live births", "format": ",.0f"}
     ]
   },
   "layer": [
-    {
-      "mark": {
-        "type": "line",
-        "strokeWidth": 3,
-        "color": "#756BB1"
-      }
-    },
-    {
-      "mark": {
-        "type": "point",
-        "filled": true,
-        "size": 55,
-        "color": "#756BB1"
-      }
-    },
+    {"mark": {"type": "line", "strokeWidth": 3, "color": "#756BB1"}},
+    {"mark": {"type": "point", "filled": true, "size": 55, "color": "#756BB1"}},
     {
       "transform": [
         {"filter": "datum.Year === 2024"}
       ],
       "mark": {
-        "type": "text",
-        "align": "right",
-        "dx": -8,
-        "dy": -15,
-        "fontSize": 13,
-        "fontWeight": "bold",
-        "color": "#54278F"
+        "type": "text", "align": "right", "dx": -8, "dy": -15,
+        "fontSize": 13, "fontWeight": "bold","color": "#54278F"
       },
-      "encoding": {
-        "text": {
-          "field": "Births",
-          "type": "quantitative",
-          "format": ",.0f"
-        }
-      }
+      "encoding": {"text": {"field": "Births", "type": "quantitative", "format": ",.0f"}}
     }
   ],
   "config": {
     "font": "Arial",
     "view": {"stroke": null},
-    "axis": {
-      "labelFontSize": 12,
-      "titleFontSize": 13,
-      "domain": false,
-      "tickColor": "#CCCCCC"
-    }
+    "axis": {"labelFontSize": 12, "titleFontSize": 13, "domain": false, "tickColor": "#CCCCCC"}
   }
 }
