@@ -429,10 +429,11 @@
 
         // Move Vega-Lite legends below the charts.
         function moveLegends(node) {
+          // Recursively traverse the spec object to find and modify legend properties.
           if (!node || typeof node !== "object") {
             return;
           }
-
+          
           if (Array.isArray(node)) {
             node.forEach(moveLegends);
             return;
@@ -442,6 +443,7 @@
             node.legend &&
             typeof node.legend === "object"
           ) {
+            // Move the  discovered legend below the chart
             node.legend.orient = "bottom";
             node.legend.direction = "horizontal";
 
