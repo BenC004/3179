@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Malaysia's Education Trends</title>
+  <meta
+    name="description"
+    content="Explore Malaysia's school enrolment, demographic changes, schools and teachers."
+  >
+
+  <title>School Enrolment Trends in Malaysia</title>
 
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
@@ -15,336 +19,1156 @@
 </head>
 
 <body>
+  <a class="skip-link" href="#national">Skip to the story</a>
 
-  <div class="page">
+  <nav class="story-nav" aria-label="Story chapters">
+    <a class="nav-brand" href="#top">MY / EDUCATION</a>
 
-    <!-- TITLE -->
-    <div class="title-banner">
-      <h1>Malaysia's Education Trends</h1>
+    <div class="nav-links">
+      <a href="#national">The national picture</a>
+      <a href="#states">State differences</a>
+      <a href="#demographics">The next generation</a>
+      <a href="#provision">Schools &amp; teachers</a>
+    </div>
+  </nav>
 
-      <p class="subtitle">
-        Student enrolment, demographics, schools and teachers
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <p class="eyebrow">Malaysia / 2017–2025</p>
+
+      <h1>
+        School Enrolment Trends<br>
+        <em>in Malaysia.</em>
+      </h1>
+
+      <p class="hero-question">
+        <span class="sentence-line">
+          Student numbers barely changed nationally.
+        </span>
+        <span class="sentence-line">
+          Why does the picture differ across states?
+        </span>
+      </p>
+
+      <p class="hero-description">
+        <span class="sentence-line">
+          Explore Malaysia’s school enrolment, demographics, schools and teachers.
+        </span>
+        <span class="sentence-line">
+          This story supports readers interested in education planning.
+        </span>
       </p>
     </div>
+  </header>
 
-    <p>
-      Malaysia's student numbers look stable nationally,
-      but how are they changing across states?
+  <section class="state-picker" aria-labelledby="state-picker-title">
+    <h2 id="state-picker-title">Choose your state</h2>
+
+    <p id="state-picker-help">
+      <span class="sentence-line">
+        Choose a state by clicking its flag.
+      </span>
+      <span class="sentence-line">
+        Malaysia is selected by default.
+      </span>
+      <span class="sentence-line">
+        This updates charts with state selection controls.
+      </span>
+      <span class="sentence-line">
+        Comparison charts retain all states.
+      </span>
     </p>
 
-    <p>
-      This visualisation explores enrolment from 2017 to 2025,
-      demographic patterns and the provision of schools
-      and teachers.
+    <select id="dashboard-state" aria-label="Selected state" hidden></select>
+
+    <div
+      id="state-flags"
+      class="state-flags"
+      role="group"
+      aria-label="Choose a state"
+      aria-describedby="state-picker-help"
+    ></div>
+
+    <p
+      id="state-picker-status"
+      class="state-picker-status"
+      role="status"
+    >
+      Showing Malaysia where available.
     </p>
+  </section>
 
-    <!-- SECTION 1 -->
-    <div class="section">
+  <main class="page">
 
-      <div class="section-heading">
-        <p class="section-label">Part 1 — Enrolment trends</p>
-        <h2>How have student numbers changed over time?</h2>
-      </div>
+    <!-- PART 1 -->
+    <section
+      class="chapter"
+      id="national"
+      aria-labelledby="national-title"
+    >
+      <header class="chapter-heading">
+        <span class="chapter-number" aria-hidden="true">01</span>
 
-      <p>
-        A stable national total can conceal different
-        trends in primary and secondary enrolment.
-      </p>
+        <div>
+          <p class="eyebrow">The national picture</p>
 
-      <div class="chart-story">
+          <h2 id="national-title">
+            A steady total.<br>
+            <em>Two different directions.</em>
+          </h2>
 
-        <div id="chart1" class="chart"></div>
-
-        <div class="insight">
-          <h4>National context</h4>
-          <p>
-            Malaysia's primary enrolment increased by
-            <strong>2.4%</strong> from 2017 to 2025,
-            while secondary enrolment fell by
-            <strong>3.2%</strong>.
-            Together, they changed by only
-            <strong>−0.09%</strong>.
+          <p class="chapter-intro">
+            <span class="sentence-line">
+              Begin with national enrolment.
+            </span>
+            <span class="sentence-line">
+              Then compare primary and secondary education.
+            </span>
+            <span class="sentence-line">
+              Their opposing changes almost cancel each other out.
+            </span>
           </p>
         </div>
 
-      </div>
+        <aside class="chapter-question">
+          <span>The question</span>
+          <p>What does the national total conceal?</p>
+        </aside>
+      </header>
 
-    </div>
+      <div class="chapter-body">
+        <p class="story-lead">
+          <span class="sentence-line">
+            Combined enrolment fell by
+            <strong class="term term-decrease">4,537 students</strong>
+            between 2017 and 2025.
+          </span>
+          <span class="sentence-line">
+            Primary enrolment grew while secondary enrolment declined.
+          </span>
+        </p>
 
-    <!-- SECTION 2 -->
-    <div class="section">
+        <div class="chart-story">
+          <div id="chart1" class="chart"></div>
 
-      <div class="section-heading">
-        <p class="section-label">Part 2 — State differences</p>
-        <h2>Where are enrolments growing or declining?</h2>
-      </div>
+          <aside class="insight">
+            <h4>A balance of opposing changes</h4>
 
-      <p>
-        Compare state contributions, percentage changes,
-        student concentration and annual enrolment patterns.
-      </p>
-
-      <div class="chart-story">
-
-        <div id="chart2" class="chart"></div>
-
-        <div class="insight">
-          <h4>Growth and decline offset one another</h4>
-          <p>
-            Selangor added <strong>51,626 students</strong>
-            between 2017 and 2025. Sarawak lost
-            <strong>43,214</strong>.
-            The national net change was much smaller:
-            a decline of <strong>4,537 students</strong>.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="chart-row">
-
-        <div class="chart-card">
-          <div id="chart3" class="chart compact"></div>
-
-          <div class="insight">
-            <h4>A large percentage from a small base</h4>
             <p>
-              Putrajaya's combined enrolment grew by
-              <strong>71.6%</strong>, compared with
-              <strong>5.8%</strong> in Selangor.
-              Percentage growth and the number of
-              additional students answer different questions.
+              <span class="sentence-line">
+                Primary enrolment rose
+                <strong class="term term-primary">2.4%</strong>
+                between 2017 and 2025.
+              </span>
+              <span class="sentence-line">
+                Secondary enrolment fell
+                <strong class="term term-secondary">3.2%</strong>
+                over this period.
+              </span>
+              <span class="sentence-line">
+                These opposing changes left combined enrolment almost unchanged.
+              </span>
             </p>
-          </div>
+          </aside>
         </div>
 
-        <div class="chart-card">
-          <div id="chart4" class="chart compact"></div>
-
-          <div class="insight">
-            <h4>One in five students</h4>
-            <p>
-              Selangor accounted for approximately
-              <strong>19.5%</strong> of Malaysia's government
-              primary and secondary enrolment in 2025—the
-              largest share among states and territories.
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="chart-story">
-
-        <div id="chart5" class="chart"></div>
-
-        <div class="insight">
-          <h4>Timing matters</h4>
-          <p>
-            Perlis recorded a <strong>24.7% fall</strong>
-            in combined enrolment in 2018.
-            Later gains left its 2025 total
-            <strong>18.0% below 2017</strong>.
-            The colour cap means the 2018 decline looks
-            similar to smaller declines.
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- SECTION 3 -->
-    <div class="section">
-
-      <div class="section-heading">
-        <p class="section-label">Part 3 — Demographics</p>
-        <h2>How do gender and demographic patterns differ?</h2>
-      </div>
-
-      <p>
-        Student composition, the young population and births
-        provide context for current enrolment and future
-        school demand.
-      </p>
-
-      <div class="chart-row">
-
-        <div class="chart-card">
-          <div id="chart6" class="chart compact"></div>
-
-          <div class="insight">
-            <h4>National context</h4>
-            <p>
-              In Malaysia in 2025, girls represented
-              <strong>48.7%</strong> of primary students
-              and <strong>49.4%</strong> of secondary students.
-              Primary education accounted for
-              <strong>57.1%</strong> of combined enrolment.
-            </p>
-          </div>
-        </div>
-
-        <div class="chart-card">
-          <div id="chart9" class="chart compact"></div>
-
-          <div class="insight">
-            <h4>National context</h4>
-            <p>
-              Malaysia recorded <strong>414,918 births</strong>
-              in 2024, <strong>18.4% fewer</strong> than in 2017.
-              Births rebounded in 2023 before falling again
-              in 2024.
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="chart-story">
-
-        <div id="chart7" class="chart"></div>
-
-        <div class="insight">
-          <h4>Read across each profile</h4>
-          <p>
-            Each connected line represents one state across
-            three different growth measures.
-            It is not a timeline.
-            Differences between the axes show how population
-            and enrolment changes diverge.
-          </p>
-        </div>
-
-      </div>
-
-      <div class="chart-story">
-
-        <div id="chart8" class="chart"></div>
-
-        <div class="insight">
-          <h4>National context</h4>
-          <p>
-            Malaysia's population aged 0–4 fell from about
-            <strong>2.61 million</strong> in 2017 to
-            <strong>2.26 million</strong> in 2025.
-            The youngest cohort became smaller even as
-            primary enrolment increased.
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- SECTION 4 -->
-    <div class="section">
-
-      <div class="section-heading">
-        <p class="section-label">Part 4 — Schools and teachers</p>
-        <h2>Are schools and teachers keeping pace?</h2>
-      </div>
-
-      <p>
-        Compare school provision with student numbers,
-        examine teacher growth and explore staffing
-        differences across districts.
-      </p>
-
-      <div id="chart10" class="chart"></div>
-
-      <div class="insight">
-        <h4>More schools does not mean more students per school</h4>
-        <p>
-          In 2025, Sarawak had <strong>1,460</strong> government
-          primary and secondary schools, averaging about
-          <strong>277 students per school</strong>.
-          Selangor had <strong>945</strong>, averaging about
-          <strong>995</strong>.
-          These are school-level averages, not classroom sizes.
+        <p class="chapter-lesson">
+          <span>What this tells us</span>
+          <span class="sentence-group">
+            <span class="sentence-line">
+              The national total hides differences between school stages.
+            </span>
+          </span>
         </p>
       </div>
+    </section>
 
-      <div class="chart-row">
+    <!-- PART 2 -->
+    <section
+      class="chapter"
+      id="states"
+      aria-labelledby="states-title"
+    >
+      <header class="chapter-heading">
+        <span class="chapter-number" aria-hidden="true">02</span>
 
-        <div class="chart-card">
-          <div id="chart11" class="chart compact"></div>
+        <div>
+          <p class="eyebrow">State differences</p>
 
-          <div class="insight">
-            <h4>National context</h4>
-            <p>
-              From 2017 to 2025, primary teacher numbers rose
-              by <strong>2.8%</strong>, close to enrolment
-              growth of <strong>2.4%</strong>.
-              Secondary teacher numbers fell by
-              <strong>0.6%</strong>, compared with a
-              <strong>3.2%</strong> enrolment decline.
-            </p>
-          </div>
+          <h2 id="states-title">
+            One country.<br>
+            <em>Uneven change.</em>
+          </h2>
+
+          <p class="chapter-intro">
+            <span class="sentence-line">
+              The same balancing effect appears across states.
+            </span>
+            <span class="sentence-line">
+              Compare student gains and losses first.
+            </span>
+            <span class="sentence-line">
+              Then distinguish percentage growth from additional student numbers.
+            </span>
+          </p>
         </div>
 
-        <div class="chart-card">
-          <div id="chart12" class="chart compact"></div>
+        <aside class="chapter-question">
+          <span>The question</span>
+          <p>Where is enrolment growing, and where is it declining?</p>
+        </aside>
+      </header>
 
-          <div class="insight">
-            <h4>Within-state differences</h4>
+      <div class="chapter-body">
+        <p class="story-lead">
+          <span class="sentence-line">
+            Selangor added
+            <strong class="term term-increase">51,626 students</strong>
+            between 2017 and 2025.
+          </span>
+          <span class="sentence-line">
+            Sarawak lost
+            <strong class="term term-decrease">43,214 students</strong>
+            during this period.
+          </span>
+          <span class="sentence-line">
+            Large state changes resulted in a small national decline.
+          </span>
+        </p>
+
+        <div class="chart-story">
+          <div id="chart2" class="chart"></div>
+
+          <aside class="insight">
+            <h4>Gains and losses offset one another</h4>
+
             <p>
-              For primary education in 2025, Selangor's
-              median district ratio was about
-              <strong>15.5 students per teacher</strong>,
-              compared with <strong>6.8</strong> in Sarawak.
-              Malaysia's overall ratio was
-              <strong>11.6</strong>.
-              Ratios do not directly measure class size.
+              <span class="sentence-line">
+                Each bar adds another state’s change.
+              </span>
+              <span class="sentence-line">
+                Increases are progressively offset by decreases.
+              </span>
+              <span class="sentence-line">
+                The final national change is
+                <strong class="term term-decrease">−4,537 students</strong>.
+              </span>
             </p>
-          </div>
+          </aside>
         </div>
 
+        <p class="story-transition">
+          <span class="sentence-line">Which state grew fastest?</span>
+          <span class="sentence-line">Which added the most students?</span>
+        </p>
+
+        <div class="chart-row">
+          <article class="chart-card">
+            <div id="chart3" class="chart"></div>
+
+            <aside class="insight">
+              <h4>Growth depends on the starting point</h4>
+
+              <p>
+                <span class="sentence-line">
+                  Putrajaya’s enrolment rose
+                  <strong class="term term-increase">71.6%</strong>
+                  between 2017 and 2025.
+                </span>
+                <span class="sentence-line">
+                  Selangor’s enrolment rose
+                  <strong class="term term-increase">5.8%</strong>
+                  during this period.
+                </span>
+                <span class="sentence-line">
+                  A smaller starting population can produce larger percentage changes.
+                </span>
+              </p>
+            </aside>
+          </article>
+
+          <article class="chart-card">
+            <div id="chart4" class="chart"></div>
+
+            <aside class="insight">
+              <h4>The largest concentration remains in Selangor</h4>
+
+              <p>
+                <span class="sentence-line">
+                  Selangor held
+                  <strong class="term term-students">19.5%</strong>
+                  of national enrolment in 2025.
+                </span>
+                <span class="sentence-line">
+                  That represents almost one in five students.
+                </span>
+                <span class="sentence-line">
+                  Circle area represents student numbers.
+                </span>
+              </p>
+            </aside>
+          </article>
+        </div>
+
+        <p class="story-transition">
+          <span class="sentence-line">
+            The endpoints show the overall change.
+          </span>
+          <span class="sentence-line">
+            The annual pattern shows when it happened.
+          </span>
+        </p>
+
+        <div class="chart-story">
+          <div id="chart5" class="chart"></div>
+
+          <aside class="insight">
+            <h4>A decline followed by partial recovery</h4>
+
+            <p>
+              <span class="sentence-line">
+                Perlis recorded a
+                <strong class="term term-decrease">24.7% fall</strong>
+                in 2018.
+              </span>
+              <span class="sentence-line">
+                Its 2025 enrolment remained
+                <strong class="term term-decrease">18.0% below 2017</strong>.
+              </span>
+              <span class="sentence-line">
+                The colour scale is capped at ±5%.
+              </span>
+              <span class="sentence-line">
+                Larger declines share the darkest shade.
+              </span>
+              <span class="sentence-line">
+                Hover for exact values.
+              </span>
+            </p>
+          </aside>
+        </div>
+
+        <p class="chapter-lesson">
+          <span>What this tells us</span>
+          <span class="sentence-group">
+            <span class="sentence-line">
+              Read student counts, percentage changes and timing together.
+            </span>
+            <span class="sentence-line">
+              Each answers a different question.
+            </span>
+          </span>
+        </p>
       </div>
+    </section>
 
-    </div>
+    <!-- PART 3 -->
+    <section
+      class="chapter"
+      id="demographics"
+      aria-labelledby="demographics-title"
+    >
+      <header class="chapter-heading">
+        <span class="chapter-number" aria-hidden="true">03</span>
 
-    <!-- FOOTER -->
-    <div class="footer">
+        <div>
+          <p class="eyebrow">The next generation</p>
 
-      <p><strong>Data Sources:</strong></p>
+          <h2 id="demographics-title">
+            Today’s students.<br>
+            <em>Tomorrow’s school demand.</em>
+          </h2>
+
+          <p class="chapter-intro">
+            <span class="sentence-line">
+              Who attends school today?
+            </span>
+            <span class="sentence-line">
+              How is the younger population changing?
+            </span>
+            <span class="sentence-line">
+              Student composition describes the present.
+            </span>
+            <span class="sentence-line">
+              Births and age groups provide future context.
+            </span>
+          </p>
+        </div>
+
+        <aside class="chapter-question">
+          <span>The question</span>
+          <p>What demographic changes accompany enrolment trends?</p>
+        </aside>
+      </header>
+
+      <div class="chapter-body">
+        <p class="story-lead">
+          <span class="sentence-line">
+            Boys and girls have nearly equal enrolment shares.
+          </span>
+          <span class="sentence-line">
+            Births fell
+            <strong class="term term-decrease">18.4%</strong>
+            between 2017 and 2024.
+          </span>
+          <span class="sentence-line">
+            These measures describe different generations.
+          </span>
+        </p>
+
+        <div class="chart-row births-row">
+          <article class="chart-card">
+            <div id="chart6" class="chart"></div>
+
+            <aside class="insight">
+              <h4>A nearly balanced student population</h4>
+
+              <p>
+                <span class="sentence-line">
+                  Girls represented
+                  <strong class="term term-girls">48.7%</strong>
+                  of primary enrolment nationally in 2025.
+                </span>
+                <span class="sentence-line">
+                  They represented
+                  <strong class="term term-girls">49.4%</strong>
+                  of secondary enrolment.
+                </span>
+                <span class="sentence-line">
+                  Waffle cells use rounded shares.
+                </span>
+                <span class="sentence-line">
+                  Hover for exact values.
+                </span>
+              </p>
+            </aside>
+          </article>
+
+          <article class="chart-card">
+            <div id="chart9" class="chart"></div>
+
+            <aside class="insight">
+              <h4>Declines varied across states</h4>
+
+              <p>
+                <span class="sentence-line">
+                  Every state recorded fewer births in 2024 than 2017.
+                </span>
+                <span class="sentence-line">
+                  Putrajaya’s birth count fell
+                  <strong class="term term-decrease">38.5%</strong>.
+                </span>
+                <span class="sentence-line">
+                  Malaysia’s total fell
+                  <strong class="term term-decrease">18.4%</strong>,
+                  reaching <strong>414,918 births</strong>.
+                </span>
+                <span class="sentence-line">
+                  These percentages compare changes, rather than population sizes.
+                </span>
+                <span class="sentence-line">
+                  Select a state to outline its row.
+                </span>
+              </p>
+            </aside>
+          </article>
+        </div>
+
+        <p class="story-transition">
+          <span class="sentence-line">
+            Compare the youngest generation with older age groups.
+          </span>
+        </p>
+
+        <div class="chart-story">
+          <div id="chart8" class="chart"></div>
+
+          <aside class="insight">
+            <h4>The youngest cohort became smaller</h4>
+
+            <p>
+              <span class="sentence-line">
+                Malaysia’s 0–4 population numbered about
+                <strong>2.61 million</strong> in 2017.
+              </span>
+              <span class="sentence-line">
+                It fell to about <strong>2.26 million</strong> in 2025.
+              </span>
+              <span class="sentence-line">
+                Primary enrolment increased over this period.
+              </span>
+              <span class="sentence-line">
+                These measures describe different age groups.
+              </span>
+            </p>
+          </aside>
+        </div>
+
+        <p class="story-transition">
+          <span class="sentence-line">
+            Do population and enrolment move together across states?
+          </span>
+          <span class="sentence-line">
+            Compare their growth profiles.
+          </span>
+        </p>
+
+        <div class="chart-story">
+          <div id="chart7" class="chart"></div>
+
+          <aside class="insight">
+            <h4>Follow one state across three measures</h4>
+
+            <p>
+              <span class="sentence-line">
+                Select a state to follow its profile.
+              </span>
+              <span class="sentence-line">
+                Compare child population growth with enrolment growth.
+              </span>
+              <span class="sentence-line">
+                The axes compare measures, not years.
+              </span>
+              <span class="sentence-line">
+                Ages 5–14 do not exactly match either school stage.
+              </span>
+            </p>
+          </aside>
+        </div>
+
+        <p class="chapter-lesson">
+          <span>What this tells us</span>
+          <span class="sentence-group">
+            <span class="sentence-line">
+              Demographic change provides context for enrolment.
+            </span>
+            <span class="sentence-line">
+              The measures do not move together everywhere.
+            </span>
+          </span>
+        </p>
+      </div>
+    </section>
+
+    <!-- PART 4 -->
+    <section
+      class="chapter"
+      id="provision"
+      aria-labelledby="provision-title"
+    >
+      <header class="chapter-heading">
+        <span class="chapter-number" aria-hidden="true">04</span>
+
+        <div>
+          <p class="eyebrow">Schools &amp; teachers</p>
+
+          <h2 id="provision-title">
+            Changing numbers.<br>
+            <em>Different local needs.</em>
+          </h2>
+
+          <p class="chapter-intro">
+            <span class="sentence-line">
+              Student counts describe only part of provision.
+            </span>
+            <span class="sentence-line">
+              Compare schools, teachers and district staffing ratios.
+            </span>
+            <span class="sentence-line">
+              Each measure reveals a different aspect.
+            </span>
+          </p>
+        </div>
+
+        <aside class="chapter-question">
+          <span>The question</span>
+          <p>How does provision differ across places?</p>
+        </aside>
+      </header>
+
+      <div class="chapter-body">
+        <p class="story-lead">
+          <span class="sentence-line">
+            Sarawak had more government schools than Selangor in 2025.
+          </span>
+          <span class="sentence-line">
+            Its average enrolment per school was much lower.
+          </span>
+          <span class="sentence-line">
+            School counts and school sizes reveal different patterns.
+          </span>
+        </p>
+
+        <div id="chart10" class="chart"></div>
+
+        <aside class="insight">
+          <h4>More schools, fewer students per school</h4>
+
+          <p>
+            <span class="sentence-line">
+              Sarawak had <strong>1,460 schools</strong> in 2025.
+            </span>
+            <span class="sentence-line">
+              It averaged approximately
+              <strong class="term term-ratio">277 students per school</strong>.
+            </span>
+            <span class="sentence-line">
+              Selangor had <strong>945 schools</strong>.
+            </span>
+            <span class="sentence-line">
+              It averaged approximately
+              <strong class="term term-ratio">995 students per school</strong>.
+            </span>
+            <span class="sentence-line">
+              These averages do not measure classroom size.
+            </span>
+          </p>
+        </aside>
+
+        <p class="story-transition">
+          <span class="sentence-line">
+            Schools describe one aspect of provision.
+          </span>
+          <span class="sentence-line">
+            Teacher numbers provide another perspective.
+          </span>
+        </p>
+
+        <div class="chart-story">
+          <div id="chart11" class="chart"></div>
+
+          <aside class="insight">
+            <h4>Compare teacher growth with student growth</h4>
+
+            <p>
+              <span class="sentence-line">
+                National primary teacher numbers rose
+                <strong class="term term-primary">2.8%</strong>
+                from 2017 to 2025.
+              </span>
+              <span class="sentence-line">
+                Primary enrolment rose
+                <strong class="term term-primary">2.4%</strong>
+                over this period.
+              </span>
+              <span class="sentence-line">
+                Secondary teacher numbers fell
+                <strong class="term term-secondary">0.6%</strong>.
+              </span>
+              <span class="sentence-line">
+                Secondary enrolment fell
+                <strong class="term term-secondary">3.2%</strong>.
+              </span>
+              <span class="sentence-line">
+                Use the controls to compare places and school stages.
+              </span>
+            </p>
+          </aside>
+        </div>
+
+        <p class="story-transition">
+          <span class="sentence-line">
+            State summaries can hide differences among districts.
+          </span>
+        </p>
+
+        <div class="chart-story">
+          <div id="chart12" class="chart"></div>
+
+          <aside class="insight">
+            <h4>Look inside each state</h4>
+
+            <p>
+              <span class="sentence-line">
+                Compare primary district ratios in 2025.
+              </span>
+              <span class="sentence-line">
+                Selangor’s median was
+                <strong class="term term-primary">15.5 students per teacher</strong>.
+              </span>
+              <span class="sentence-line">
+                Sarawak’s median was
+                <strong class="term term-primary">6.8</strong>.
+              </span>
+              <span class="sentence-line">
+                Malaysia’s overall ratio was
+                <strong class="term term-primary">11.6</strong>.
+              </span>
+              <span class="sentence-line">
+                Boxes show the middle half of districts.
+              </span>
+              <span class="sentence-line">
+                These ratios do not directly measure class size.
+              </span>
+            </p>
+          </aside>
+        </div>
+
+        <p class="chapter-lesson">
+          <span>What this tells us</span>
+          <span class="sentence-group">
+            <span class="sentence-line">
+              National and state averages provide starting points.
+            </span>
+            <span class="sentence-line">
+              District comparisons reveal differences hidden by these totals.
+            </span>
+          </span>
+        </p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p class="eyebrow">Sources &amp; scope</p>
+
+      <p>
+        Education figures cover Malaysia’s government primary and secondary schools.
+        Commentary figures provide national context.
+        They remain national when chart selections change.
+      </p>
 
       <div class="source-entry">
-        <strong>1. Education Data</strong>
-        <p class="source-citation">
-          Ministry of Education Malaysia,
+        <strong>1. Education data</strong>
+        <p>
+          Ministry of Education Malaysia.
           <em>Student Enrolment, Schools and Teachers by District</em>,
           2017–2025.
+          Education records use 1 January for 2017–2022.
+          They use 30 June for 2023–2025.
         </p>
       </div>
 
       <div class="source-entry">
-        <strong>2. Population and Birth Data</strong>
-        <p class="source-citation">
-          Department of Statistics Malaysia (DOSM),
+        <strong>2. Population and birth data</strong>
+        <p>
+          Department of Statistics Malaysia (DOSM).
           <em>State Population and Annual Live Births</em>.
-          Population: 2017 and 2025; births: 2017–2024.
+          Population comparisons: 2017 and 2025.
+          Birth records: 2017–2024.
         </p>
+      </div>
+
+      <div class="flag-credits">
+        <p>Flag images: Wikimedia Commons.</p>
+        <p>Original files, credits and licences:</p>
+        <p id="flag-credit-links"></p>
       </div>
 
       <p class="author-credit">
-        A visualization by Ben Chong Wei Heng |
+        A visualisation by Ben Chong Wei Heng<br>
         34860398 | October 2026
       </p>
-
-    </div>
-
-  </div>
+    </footer>
+  </main>
 
   <script>
-    var chartFolder = new URL(
-      "charts/",
-      window.location.href
-    ).href;
+    const chartFolder = new URL("charts/", window.location.href).href;
+    const chartViews = new Map();
+    const stateTargets = new Map();
 
-    var chartViews = new Map();
+    let dashboardState = "Malaysia";
+    let stateSelectionVersion = 0;
 
-    // Preserve dynamic titles from the original specifications.
+    const globalStateSelect =
+      document.getElementById("dashboard-state");
+
+    const globalStateStatus =
+      document.getElementById("state-picker-status");
+
+    const flagsContainer =
+      document.getElementById("state-flags");
+
+    const flagCreditLinks =
+      document.getElementById("flag-credit-links");
+
+    const stateFlags = [
+      ["Malaysia", "Malaysia", "6/66", "Flag_of_Malaysia.svg"],
+      ["Johor", "Johor", "5/5a", "Flag_of_Johor.svg"],
+      ["Kedah", "Kedah", "c/cc", "Flag_of_Kedah.svg"],
+      ["Kelantan", "Kelantan", "6/61", "Flag_of_Kelantan.svg"],
+      ["Melaka", "Melaka", "0/09", "Flag_of_Malacca.svg"],
+      [
+        "Negeri Sembilan",
+        "Negeri Sembilan",
+        "d/db",
+        "Flag_of_Negeri_Sembilan.svg"
+      ],
+      ["Pahang", "Pahang", "a/aa", "Flag_of_Pahang.svg"],
+      ["Perak", "Perak", "8/87", "Flag_of_Perak.svg"],
+      ["Perlis", "Perlis", "a/aa", "Flag_of_Perlis.svg"],
+      [
+        "Pulau Pinang",
+        "Pulau Pinang",
+        "a/a1",
+        "Flag_of_Penang_from_xrmap.svg"
+      ],
+      ["Sabah", "Sabah", "b/b5", "Flag_of_Sabah.svg"],
+      ["Sarawak", "Sarawak", "7/7e", "Flag_of_Sarawak.svg"],
+      ["Selangor", "Selangor", "0/0c", "Flag_of_Selangor.svg"],
+      ["Terengganu", "Terengganu", "6/6b", "Flag_of_Terengganu.svg"],
+      [
+        "W.P. Kuala Lumpur",
+        "Kuala Lumpur",
+        "6/64",
+        "Flag_of_Kuala_Lumpur%2C_Malaysia.svg"
+      ],
+      [
+        "W.P. Labuan",
+        "Labuan",
+        "6/69",
+        "Flag_of_Labuan.svg"
+      ],
+      [
+        "W.P. Putrajaya",
+        "Putrajaya",
+        "9/9f",
+        "Flag_of_Putrajaya.svg"
+      ]
+    ];
+
+    stateFlags.forEach(function(state, index) {
+      const [value, label, directory, filename] = state;
+
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      globalStateSelect.appendChild(option);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "state-flag";
+      button.dataset.state = value;
+      button.setAttribute(
+        "aria-pressed",
+        String(value === dashboardState)
+      );
+
+      const name = document.createElement("span");
+      name.className = "state-flag-name";
+      name.textContent = label;
+
+      const image = document.createElement("img");
+      image.src =
+        "https://upload.wikimedia.org/wikipedia/commons/" +
+        directory + "/" + filename;
+      image.alt = "";
+      image.width = 80;
+      image.height = 40;
+      image.decoding = "async";
+
+      button.append(name, image);
+
+      button.addEventListener("click", function() {
+        globalStateSelect.value = value;
+        globalStateSelect.dispatchEvent(new Event("change"));
+      });
+
+      flagsContainer.appendChild(button);
+
+      if (index > 0) {
+        flagCreditLinks.appendChild(
+          document.createTextNode(" · ")
+        );
+      }
+
+      const credit = document.createElement("a");
+      credit.href =
+        "https://commons.wikimedia.org/wiki/File:" + filename;
+      credit.textContent = label;
+      flagCreditLinks.appendChild(credit);
+    });
+
+    function updateFlagSelection() {
+      document.querySelectorAll(".state-flag").forEach(function(button) {
+        button.setAttribute(
+          "aria-pressed",
+          String(button.dataset.state === dashboardState)
+        );
+      });
+    }
+
+    function stateValueForControl(control, state) {
+      const options = control.bind && control.bind.options;
+
+      if (!Array.isArray(options)) return null;
+      if (options.includes(state)) return state;
+
+      if (state === "Malaysia") {
+        if (options.includes("All states")) return "All states";
+        if (options.includes("All locations")) return "All locations";
+      }
+
+      return null;
+    }
+
+    async function applyDashboardState(view, controls, state) {
+      controls.forEach(function(control) {
+        const value = stateValueForControl(control, state);
+
+        if (value !== null) {
+          view.signal(control.name, value);
+        }
+      });
+
+      await view.runAsync();
+    }
+
+    globalStateSelect.addEventListener("change", async function() {
+      dashboardState = globalStateSelect.value;
+      updateFlagSelection();
+
+      stateSelectionVersion += 1;
+      const selectedVersion = stateSelectionVersion;
+
+      globalStateStatus.textContent = "Updating selected charts…";
+
+      const results = await Promise.allSettled(
+        Array.from(chartViews.entries()).map(function(entry) {
+          const [id, view] = entry;
+          const controls = stateTargets.get(id) || [];
+
+          return applyDashboardState(view, controls, dashboardState);
+        })
+      );
+
+      if (selectedVersion !== stateSelectionVersion) return;
+
+      const failed = results.some(function(result) {
+        return result.status === "rejected";
+      });
+
+      globalStateStatus.textContent = failed
+        ? "Some charts could not update. Try selecting again."
+        : "Showing " +
+          dashboardState.replace("W.P. ", "") +
+          " where available.";
+
+      requestAnimationFrame(alignPairs);
+    });
+
+    const shortDescriptions = {
+      1: [
+        "Government primary and secondary enrolment, 2017–2025.",
+        "Select a state to compare both school stages."
+      ],
+      2: [
+        "Combined government school enrolment change, 2017–2025.",
+        "Bars show each state’s contribution to the national change."
+      ],
+      3: [
+        "Combined government school enrolment change, 2017–2025.",
+        "Colour scale capped at ±20%.",
+        "Hover for exact values."
+      ],
+      4: [
+        "Government school enrolment by state, 2025.",
+        "Larger circles represent more students."
+      ],
+      5: [
+        "Annual government school enrolment change, 2018–2025.",
+        "Primary and secondary enrolment are combined.",
+        "Each year compares with the previous year.",
+        "Colour scale capped at ±5%."
+      ],
+      6: [
+        "Government primary and secondary enrolment, 2025.",
+        "Each square represents 1%; half represents 0.5%.",
+        "Shares are rounded to the nearest 0.5 percentage point.",
+        "Blue = boys; pink = girls.",
+        "Hover for exact values."
+      ],
+      7: [
+        "Percentage change by state, 2017–2025.",
+        "All three axes use the same scale.",
+        "Population ages 5–14 differ from school-stage age ranges.",
+        "Select or hover over a state to highlight its profile."
+      ],
+      8: [
+        "Population aged 0–24, by age group and sex.",
+        "Compare 2017 with 2025.",
+        "Male populations appear left; female populations appear right.",
+        "Both years use the same population scale."
+      ],
+      9: [
+        "Registered live births compared with each location’s 2017 baseline.",
+        "Each colour band represents ten percentage points.",
+        "Blue indicates increases; red indicates decreases.",
+        "Darker shades show larger changes from 2017.",
+        "Right labels show 2024 changes."
+      ],
+      10: [
+        "Government primary and secondary schools by state, 2025.",
+        "State shape area represents school count.",
+        "Darker brown represents more students per school.",
+        "Shapes are resized and separated; positions are approximate.",
+        "Grey squares provide school-count area references."
+      ],
+      11: [
+        "Government school percentage change, 2017–2025.",
+        "Above the diagonal: teacher growth exceeds enrolment growth.",
+        "Below the diagonal: enrolment growth exceeds teacher growth."
+      ],
+      12: [
+        "Government school students per teacher, 30 June 2025.",
+        "Boxes show the middle half of districts.",
+        "Central lines mark district medians.",
+        "The dashed line marks Malaysia’s overall ratio."
+      ]
+    };
+
+    function highlightTerms(element) {
+      const terms =
+        /\b(primary|secondary|boys?|girls?|male|female|increases?|increased|increasing|gains?|added|rose|grew|decreases?|decreased|decreasing|declines?|declined|losses|lost|fell|fall)\b/gi;
+
+      const classes = {
+        primary: "primary",
+        secondary: "secondary",
+        boy: "boys",
+        boys: "boys",
+        male: "boys",
+        girl: "girls",
+        girls: "girls",
+        female: "girls",
+        increase: "increase",
+        increases: "increase",
+        increased: "increase",
+        increasing: "increase",
+        gain: "increase",
+        gains: "increase",
+        added: "increase",
+        rose: "increase",
+        grew: "increase",
+        decrease: "decrease",
+        decreases: "decrease",
+        decreased: "decrease",
+        decreasing: "decrease",
+        decline: "decrease",
+        declines: "decrease",
+        declined: "decrease",
+        losses: "decrease",
+        lost: "decrease",
+        fell: "decrease",
+        fall: "decrease"
+      };
+
+      const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT
+      );
+
+      const nodes = [];
+
+      while (walker.nextNode()) {
+        if (!walker.currentNode.parentElement.closest(".term")) {
+          nodes.push(walker.currentNode);
+        }
+      }
+
+      nodes.forEach(function(node) {
+        const value = node.nodeValue;
+        const fragment = document.createDocumentFragment();
+
+        let match;
+        let cursor = 0;
+        terms.lastIndex = 0;
+
+        while ((match = terms.exec(value))) {
+          fragment.appendChild(
+            document.createTextNode(
+              value.slice(cursor, match.index)
+            )
+          );
+
+          const span = document.createElement("span");
+          span.className =
+            "term term-" + classes[match[0].toLowerCase()];
+          span.textContent = match[0];
+
+          fragment.appendChild(span);
+          cursor = match.index + match[0].length;
+        }
+
+        if (!cursor) return;
+
+        fragment.appendChild(
+          document.createTextNode(value.slice(cursor))
+        );
+
+        node.replaceWith(fragment);
+      });
+    }
+
+    function styleChartText(compiled) {
+      const legendLabelColour =
+        "datum.value === 'Primary' || datum.value === 'primary' " +
+        "? '#54278F' : " +
+        "datum.value === 'Secondary' || datum.value === 'secondary' " +
+        "? '#AD5700' : " +
+        "datum.value === 'Boys' || datum.value === 'Male' " +
+        "? '#35618B' : " +
+        "datum.value === 'Girls' || datum.value === 'Female' " +
+        "? '#9D3F62' : " +
+        "datum.value === 'Increase' ? '#2166AC' : " +
+        "datum.value === 'Decrease' ? '#B2182B' : '#263238'";
+
+      function visit(node) {
+        if (!node || typeof node !== "object") return;
+
+        if (Array.isArray(node)) {
+          node.forEach(visit);
+          return;
+        }
+
+        if (node.legends) {
+          node.legends.forEach(function(legend) {
+            legend.labelFont = "Arial";
+            legend.titleFont = "Arial";
+            legend.labelFontSize = 14;
+            legend.titleFontSize = 14;
+
+            legend.encode = legend.encode || {};
+            legend.encode.labels = legend.encode.labels || {};
+
+            legend.encode.labels.update = Object.assign(
+              {},
+              legend.encode.labels.update,
+              {
+                fill: { signal: legendLabelColour },
+                fontWeight: { value: "bold" }
+              }
+            );
+          });
+        }
+
+        if (node.type === "text" && node.encode) {
+          ["enter", "update"].forEach(function(channel) {
+            const encoding = node.encode[channel];
+            if (!encoding) return;
+
+            encoding.font = { value: "Arial" };
+
+            if (
+              encoding.fontSize &&
+              typeof encoding.fontSize.value === "number" &&
+              encoding.fontSize.value >= 12
+            ) {
+              encoding.fontSize.value = Math.min(
+                16,
+                encoding.fontSize.value + 1
+              );
+            }
+          });
+        }
+
+        Object.keys(node).forEach(function(key) {
+          if (key !== "legends") visit(node[key]);
+        });
+      }
+
+      visit(compiled);
+      return compiled;
+    }
+
     function titleSignal(name, value) {
       if (
         value &&
@@ -352,10 +1176,7 @@
         !Array.isArray(value) &&
         value.signal
       ) {
-        return {
-          name: name,
-          update: value.signal
-        };
+        return { name: name, update: value.signal };
       }
 
       return {
@@ -364,42 +1185,37 @@
       };
     }
 
-    // Display title and subtitle lines safely as HTML text.
     function showText(element, value) {
       element.replaceChildren();
 
-      var lines = Array.isArray(value) ? value : [value];
+      const lines = Array.isArray(value) ? value : [value];
 
-      lines.forEach(function (line, index) {
-        if (index) {
-          element.appendChild(document.createElement("br"));
+      lines.forEach(function(line) {
+        const text = String(line == null ? "" : line).trim();
+        if (!text) return;
+
+        const words = text.split(/\s+/);
+
+        for (let offset = 0; offset < words.length; offset += 10) {
+          const span = document.createElement("span");
+          span.className = "sentence-line";
+          span.textContent = words.slice(offset, offset + 10).join(" ");
+          element.appendChild(span);
         }
-
-        element.appendChild(
-          document.createTextNode(
-            String(line == null ? "" : line)
-          )
-        );
       });
     }
 
-    // Position Vega-Lite legends below their charts.
     function moveLegends(node, id) {
-      if (!node || typeof node !== "object") {
-        return;
-      }
+      if (!node || typeof node !== "object") return;
 
       if (Array.isArray(node)) {
-        node.forEach(function (item) {
+        node.forEach(function(item) {
           moveLegends(item, id);
         });
         return;
       }
 
-      if (
-        node.legend &&
-        typeof node.legend === "object"
-      ) {
+      if (node.legend && typeof node.legend === "object") {
         node.legend.orient = "bottom";
         node.legend.direction = "horizontal";
 
@@ -408,57 +1224,56 @@
         }
       }
 
-      Object.values(node).forEach(function (item) {
+      Object.values(node).forEach(function(item) {
         moveLegends(item, id);
       });
     }
 
-    // Adjust chart dimensions without stretching SVG text.
     function sizeChart(spec, id, width) {
-      var paired = [3, 4, 6, 9, 11, 12].includes(id);
-
       spec.config = spec.config || {};
       spec.config.font = "Arial";
 
-      spec.config.axis = Object.assign(
-        {},
-        spec.config.axis,
-        {
-          labelFontSize: 12,
-          titleFontSize: 13
-        }
-      );
+      spec.config.axis = Object.assign({}, spec.config.axis, {
+        labelFont: "Arial",
+        titleFont: "Arial",
+        labelFontSize: 13,
+        titleFontSize: 14
+      });
 
-      spec.config.legend = Object.assign(
-        {},
-        spec.config.legend,
-        {
-          labelFontSize: 12,
-          titleFontSize: 13
-        }
-      );
+      spec.config.legend = Object.assign({}, spec.config.legend, {
+        labelFont: "Arial",
+        titleFont: "Arial",
+        labelFontSize: 13,
+        titleFontSize: 14
+      });
 
       spec.padding = 5;
 
-      if (paired && id !== 6) {
-        var allowance =
-          id === 12 ? 150 :
-          id === 11 ? 100 :
-          id === 9 ? 85 : 20;
+      if (id === 9) {
+        spec.width = Math.max(640, Math.floor(width - 15));
+        spec.height = 620;
 
-        spec.width = Math.max(
-          220,
-          Math.floor(width - allowance)
-        );
+      } else if (id === 11) {
+        const annualBars = (spec.signals || []).some(function(signal) {
+          return signal.name === "barHeight";
+        });
 
-        spec.height =
-          id === 11 || id === 12 ? 400 : 300;
+        spec.width = Math.max(280, Math.floor(width - 100));
+        spec.height = annualBars ? 300 : 400;
+
+      } else if (id === 12) {
+        spec.width = Math.max(280, Math.floor(width - 150));
+        spec.height = 440;
+
+      } else if (id === 3 || id === 4) {
+        spec.width = Math.max(220, Math.floor(width - 20));
+        spec.height = 300;
 
       } else if (id === 6) {
         delete spec.width;
         delete spec.height;
 
-        var square = Math.max(
+        const square = Math.max(
           120,
           Math.floor((width - 50) / 2)
         );
@@ -467,32 +1282,18 @@
         spec.spec.height = square;
 
       } else if (id === 1) {
-        spec.width = Math.max(
-          300,
-          Math.floor(width - 100)
-        );
-
+        spec.width = Math.max(300, Math.floor(width - 100));
         spec.height = 350;
 
       } else if (id === 2) {
-        spec.width = Math.max(
-          320,
-          Math.floor(width - 90)
-        );
-
+        spec.width = Math.max(320, Math.floor(width - 90));
         spec.height = 500;
 
       } else if (id === 5) {
-        spec.width = Math.max(
-          320,
-          Math.floor(width - 145)
-        );
+        spec.width = Math.max(320, Math.floor(width - 145));
 
       } else if (id === 7) {
-        spec.width = Math.max(
-          480,
-          Math.floor(width - 35)
-        );
+        spec.width = Math.max(480, Math.floor(width - 35));
 
       } else if (id === 8) {
         spec.spec.width = Math.max(
@@ -501,31 +1302,25 @@
         );
 
         spec.spec.height = 350;
-
-        // Resize the pyramid's centre reference line.
         spec.spec.layer[3].encoding.y2.value = 350;
 
       } else if (id === 10) {
-        // Enlarge state geometry while retaining readable text.
-        var factor = Math.max(
-          0.6,
-          (width - 45) / 800
-        );
+        const factor = Math.max(0.6, (width - 45) / 800);
 
         spec.width = 800 * factor;
         spec.height = 520 * factor;
 
-        var areaSignal = spec.signals.find(function (signal) {
+        const areaSignal = spec.signals.find(function(signal) {
           return signal.name === "pixelsPerSchool";
         });
 
         areaSignal.value = 3 * factor * factor;
 
-        var cartogram = spec.data.find(function (dataset) {
+        const cartogram = spec.data.find(function(dataset) {
           return dataset.name === "cartogram";
         });
 
-        cartogram.transform.forEach(function (transform) {
+        cartogram.transform.forEach(function(transform) {
           if (
             transform.as === "AnchorX" ||
             transform.as === "AnchorY"
@@ -535,11 +1330,11 @@
           }
         });
 
-        var regions = spec.data.find(function (dataset) {
+        const regions = spec.data.find(function(dataset) {
           return dataset.name === "regions";
         });
 
-        regions.values.forEach(function (region) {
+        regions.values.forEach(function(region) {
           region.x *= factor;
         });
       }
@@ -549,72 +1344,65 @@
       }
 
       if (id === 11 && spec.legends) {
-        spec.legends.forEach(function (legend) {
+        spec.legends.forEach(function(legend) {
           legend.orient = "bottom";
           legend.direction = "horizontal";
         });
       }
     }
 
-    // Align heading areas, chart areas and insight starting points.
     function alignPairs() {
-      document.querySelectorAll(".chart-row").forEach(
-        function (row) {
-          var headers = Array.from(
-            row.querySelectorAll(".chart-header")
+      document.querySelectorAll(".chart-row").forEach(function(row) {
+        const headers = Array.from(
+          row.querySelectorAll(".chart-header")
+        );
+
+        const plots = Array.from(
+          row.querySelectorAll(".chart-plot")
+        );
+
+        headers.concat(plots).forEach(function(element) {
+          element.style.minHeight = "";
+        });
+
+        const columns = getComputedStyle(row)
+          .gridTemplateColumns.split(" ");
+
+        if (columns.length < 2) return;
+
+        [headers, plots].forEach(function(group) {
+          if (!group.length) return;
+
+          const height = Math.ceil(
+            Math.max(...group.map(function(element) {
+              return element.getBoundingClientRect().height;
+            }))
           );
 
-          var plots = Array.from(
-            row.querySelectorAll(".chart-plot")
-          );
-
-          headers.concat(plots).forEach(function (element) {
-            element.style.minHeight = "";
+          group.forEach(function(element) {
+            element.style.minHeight = height + "px";
           });
-
-          var columns = getComputedStyle(row)
-            .gridTemplateColumns
-            .split(" ");
-
-          if (columns.length < 2) {
-            return;
-          }
-
-          [headers, plots].forEach(function (group) {
-            var height = Math.ceil(
-              Math.max.apply(
-                null,
-                group.map(function (element) {
-                  return element.getBoundingClientRect().height;
-                })
-              )
-            );
-
-            group.forEach(function (element) {
-              element.style.minHeight = height + "px";
-            });
-          });
-        }
-      );
+        });
+      });
     }
 
     async function renderChart(id) {
-      var container = document.getElementById("chart" + id);
-      var previous = chartViews.get(id);
-      var saved = {};
+      const renderingStateVersion = stateSelectionVersion;
+      const container = document.getElementById("chart" + id);
+      const previous = chartViews.get(id);
+      const saved = {};
 
-      // Retain dropdown and checkbox values when resizing.
       if (previous) {
         [
           "selectedState",
           "selectedStage",
           "showDistricts",
           "highlightState"
-        ].forEach(function (name) {
+        ].forEach(function(name) {
           try {
             saved[name] = previous.signal(name);
           } catch (_) {
-            // This chart does not use that signal.
+            // This chart does not contain this signal.
           }
         });
 
@@ -624,25 +1412,25 @@
       chartViews.delete(id);
       container.replaceChildren();
 
-      var header = document.createElement("header");
+      const header = document.createElement("header");
       header.className = "chart-header";
 
-      var heading = document.createElement("h3");
+      const heading = document.createElement("h3");
       heading.id = "chart-heading-" + id;
 
-      var subtitle = document.createElement("p");
+      const subtitle = document.createElement("p");
       subtitle.className = "chart-description";
 
       header.append(heading, subtitle);
 
-      var plot = document.createElement("div");
+      const plot = document.createElement("div");
       plot.className = "chart-plot";
       plot.setAttribute("aria-labelledby", heading.id);
 
       container.append(header, plot);
 
       try {
-        var response = await fetch(
+        const response = await fetch(
           chartFolder + "chart" + id + ".vg.json"
         );
 
@@ -650,92 +1438,99 @@
           throw new Error("HTTP " + response.status);
         }
 
-        var spec = await response.json();
-
+        const spec = await response.json();
         sizeChart(spec, id, container.clientWidth);
 
-        var parameters = spec.params || spec.signals || [];
+        const parameters = spec.params || spec.signals || [];
 
-        parameters.forEach(function (parameter) {
+        const controls = parameters.filter(function(parameter) {
+          return (
+            parameter.name === "selectedState" ||
+            parameter.name === "highlightState"
+          );
+        });
+
+        stateTargets.set(id, controls);
+
+        parameters.forEach(function(parameter) {
           if (
-            Object.prototype.hasOwnProperty.call(
-              saved,
-              parameter.name
-            )
+            Object.prototype.hasOwnProperty.call(saved, parameter.name)
           ) {
             parameter.value = saved[parameter.name];
+
+          } else if (controls.includes(parameter)) {
+            const initialState = stateValueForControl(
+              parameter,
+              dashboardState
+            );
+
+            if (initialState !== null) {
+              parameter.value = initialState;
+            }
           }
         });
 
-        var result = await vegaEmbed(plot, spec, {
-          loader: {
-            baseURL: chartFolder
-          },
-
+        const result = await vegaEmbed(plot, spec, {
+          loader: { baseURL: chartFolder },
           actions: false,
           renderer: "svg",
 
-          patch: function (compiled) {
-            var original = compiled.title || {};
+          patch: function(compiled) {
+            const original = compiled.title || {};
+
+            original.subtitle =
+              shortDescriptions[id] || original.subtitle;
+
+            const annualBars = (spec.signals || []).some(
+              function(signal) {
+                return signal.name === "barHeight";
+              }
+            );
+
+            if (id === 11 && annualBars) {
+              original.subtitle = [
+                "Annual government school percentage change, 2018–2025.",
+                "Compare enrolment and teacher growth within each year.",
+                "Each year compares with the previous year."
+              ];
+            }
 
             compiled.signals = compiled.signals || [];
 
             compiled.signals.push(
-              titleSignal(
-                "dashboardHeading",
-                original.text
-              )
+              titleSignal("dashboardHeading", original.text),
+              titleSignal("dashboardDescription", original.subtitle)
             );
 
-            compiled.signals.push(
-              titleSignal(
-                "dashboardDescription",
-                original.subtitle
-              )
-            );
-
-            // Show the original title in the HTML header instead.
             delete compiled.title;
             compiled.background = null;
 
-            return compiled;
+            return styleChartText(compiled);
           }
         });
 
-        var view = result.view;
+        const view = result.view;
         chartViews.set(id, view);
 
+        if (renderingStateVersion !== stateSelectionVersion) {
+          await applyDashboardState(view, controls, dashboardState);
+        }
+
         function updateHeader() {
-          showText(
-            heading,
-            view.signal("dashboardHeading")
-          );
-
-          showText(
-            subtitle,
-            view.signal("dashboardDescription")
-          );
-
+          showText(heading, view.signal("dashboardHeading"));
+          showText(subtitle, view.signal("dashboardDescription"));
+          highlightTerms(subtitle);
           requestAnimationFrame(alignPairs);
         }
 
-        view.addSignalListener(
-          "dashboardHeading",
-          updateHeader
-        );
-
-        view.addSignalListener(
-          "dashboardDescription",
-          updateHeader
-        );
+        view.addSignalListener("dashboardHeading", updateHeader);
+        view.addSignalListener("dashboardDescription", updateHeader);
 
         updateHeader();
 
       } catch (error) {
         console.error("Chart " + id + ":", error);
-
         heading.textContent = "Chart " + id;
-
         plot.textContent =
           "Chart could not load. Check the browser console.";
       }
@@ -743,27 +1538,53 @@
 
     async function renderDashboard() {
       await Promise.all(
-        Array.from(
-          { length: 12 },
-          function (_, index) {
-            return renderChart(index + 1);
-          }
-        )
+        Array.from({ length: 12 }, function(_, index) {
+          return renderChart(index + 1);
+        })
       );
 
       alignPairs();
     }
 
+    document.querySelectorAll(
+      ".story-lead, .story-transition, .chapter-intro, " +
+      ".insight p, .chapter-lesson"
+    ).forEach(highlightTerms);
+
+    const sectionObserver = new IntersectionObserver(
+      function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+
+          document.querySelectorAll(".story-nav a").forEach(
+            function(link) {
+              if (link.hash === "#" + entry.target.id) {
+                link.setAttribute("aria-current", "location");
+              } else {
+                link.removeAttribute("aria-current");
+              }
+            }
+          );
+        });
+      },
+      { rootMargin: "-15% 0px -60% 0px" }
+    );
+
+    document.querySelectorAll("main > section[id]").forEach(
+      function(section) {
+        sectionObserver.observe(section);
+      }
+    );
+
     renderDashboard();
 
-    // Recalculate chart dimensions after the window width changes.
-    var resizeTimer;
-    var previousWidth = window.innerWidth;
+    let resizeTimer;
+    let previousWidth = window.innerWidth;
 
-    window.addEventListener("resize", function () {
+    window.addEventListener("resize", function() {
       clearTimeout(resizeTimer);
 
-      resizeTimer = setTimeout(function () {
+      resizeTimer = setTimeout(function() {
         if (window.innerWidth !== previousWidth) {
           previousWidth = window.innerWidth;
           renderDashboard();
@@ -771,6 +1592,5 @@
       }, 300);
     });
   </script>
-
 </body>
 </html>

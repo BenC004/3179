@@ -22,7 +22,7 @@
       "value": "All states",
       "bind": {
         "input": "select",
-        "name": "Highlight state: ",
+        "name": "Selected state: ",
         "options": [
           "All states", "Johor", "Kedah", "Kelantan", "Melaka",
           "Negeri Sembilan", "Pahang", "Perak", "Perlis", "Pulau Pinang",

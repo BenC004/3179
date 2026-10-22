@@ -1,19 +1,30 @@
 {
-  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
-  "width": 700,
-  "height": 400,
+  "$schema": "https://vega.github.io/schema/vega/v6.json",
+  "description": "Birth changes compared with each location's 2017 baseline.",
+  "width": 900,
+  "height": 620,
+  "padding": {
+    "left": 5,
+    "right": 5,
+    "top": 45,
+    "bottom": 10
+  },
   "title": {
-    "text": {"expr": "'How have annual births changed in ' + replace(selectedState, 'W.P. ', '') + '?'"},
+    "text": "How have birth trends changed across Malaysian states?",
     "subtitle": [
-      "Registered live births, 2017 - 2024",
-      "Births indicate future school demand, rather than current enrolment."
+      "Registered live births compared with each location’s 2017 baseline.",
+      "Each colour band represents ten percentage points.",
+      "Blue indicates increases; red indicates decreases.",
+      "Darker shades show larger changes from 2017.",
+      "Right labels show 2024 changes."
     ],
     "anchor": "start",
+    "font": "Georgia",
     "fontSize": 22,
+    "subtitleFont": "Arial",
     "subtitleFontSize": 13
   },
-  "data": {"url": "../source2/birth_state.csv", "format": {"type": "csv", "parse": {"abs": "number"}}},
-  "params": [
+  "signals": [
     {
       "name": "selectedState",
       "value": "Malaysia",
@@ -21,99 +32,573 @@
         "input": "select",
         "name": "Selected state: ",
         "options": [
-          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
-          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
-          "Selangor", "Terengganu", "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+          "Malaysia",
+          "Johor",
+          "Kedah",
+          "Kelantan",
+          "Melaka",
+          "Negeri Sembilan",
+          "Pahang",
+          "Perak",
+          "Perlis",
+          "Pulau Pinang",
+          "Sabah",
+          "Sarawak",
+          "Selangor",
+          "Terengganu",
+          "W.P. Kuala Lumpur",
+          "W.P. Labuan",
+          "W.P. Putrajaya"
         ],
         "labels": [
-          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
-          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
-          "Selangor", "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
+          "Malaysia",
+          "Johor",
+          "Kedah",
+          "Kelantan",
+          "Melaka",
+          "Negeri Sembilan",
+          "Pahang",
+          "Perak",
+          "Perlis",
+          "Pulau Pinang",
+          "Sabah",
+          "Sarawak",
+          "Selangor",
+          "Terengganu",
+          "Kuala Lumpur",
+          "Labuan",
+          "Putrajaya"
         ]
       }
     }
   ],
-  "transform": [
-    {"filter": "selectedState === 'Malaysia' || datum.state === selectedState"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year >= 2017 && datum.Year <= 2024"},
+  "data": [
     {
-      "aggregate": [{"op": "sum", "field": "abs", "as": "Births"}],
-      "groupby": ["Year"]
-    },
-    {"calculate": "replace(selectedState, 'W.P. ', '')", "as": "Location"}
-  ],
-  "encoding": {
-    "x": {
-      "field": "Year",
-      "type": "quantitative",
-      "scale": {"domain": [2017, 2024], "nice": false},
-      "axis": {
-        "title": "Year",
-        "format": "d",
-        "values": [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
-        "grid": false
-      }
-    },
-    "y": {
-      "field": "Births",
-      "type": "quantitative",
-      "scale": {"zero": true},
-      "axis": {
-        "title": "Live births",
-        "format": "~s",
-        "gridColor": "#EEEEEE"
-      }
-    },
-    "tooltip": [
-      {"field": "Location", "type": "nominal"},
-      {"field": "Year", "type": "quantitative", "format": "d"},
-      {"field": "Births", "type": "quantitative", "title": "Live births", "format": ",.0f"}
-    ]
-  },
-  "layer": [
-    {
-      "mark": {
-        "type": "line",
-        "strokeWidth": 3,
-        "color": "#237A57"
-      }
-    },
-    {
-      "mark": {
-        "type": "point",
-        "filled": true,
-        "size": 55,
-        "opacity": 1,
-        "color": "#237A57"
-      }
-    },
-    {
-      "transform": [
-        {"filter": "datum.Year === 2024"}
-      ],
-      "mark": {
-        "type": "text",
-        "align": "right",
-        "baseline": "top",
-        "dx": -8,
-        "dy": 18,
-        "fontSize": 13,
-        "fontWeight": "bold",
-        "color": "#237A57"
+      "name": "stateBirths",
+      "url": "../source2/birth_state.csv",
+      "format": {
+        "type": "csv",
+        "parse": {
+          "abs": "number"
+        }
       },
-      "encoding": {
-        "text": {
-          "field": "Births",
-          "type": "quantitative",
-          "format": ",.0f"
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.state !== 'Malaysia'"
+        },
+        {
+          "type": "formula",
+          "expr": "toNumber(substring(datum.date, 0, 4))",
+          "as": "Year"
+        },
+        {
+          "type": "filter",
+          "expr": "datum.Year >= 2017 && datum.Year <= 2024 && isValid(datum.abs)"
+        },
+        {
+          "type": "aggregate",
+          "groupby": ["state", "Year"],
+          "fields": ["abs"],
+          "ops": ["sum"],
+          "as": ["Births"]
+        }
+      ]
+    },
+    {
+      "name": "nationalBirths",
+      "source": "stateBirths",
+      "transform": [
+        {
+          "type": "aggregate",
+          "groupby": ["Year"],
+          "fields": ["Births"],
+          "ops": ["sum"],
+          "as": ["Births"]
+        },
+        {
+          "type": "formula",
+          "expr": "'Malaysia'",
+          "as": "state"
+        }
+      ]
+    },
+    {
+      "name": "births",
+      "source": ["stateBirths", "nationalBirths"]
+    },
+    {
+      "name": "baselines",
+      "source": "births",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.Year === 2017 && datum.Births > 0"
+        }
+      ]
+    },
+    {
+      "name": "series",
+      "source": "births",
+      "transform": [
+        {
+          "type": "lookup",
+          "from": "baselines",
+          "key": "state",
+          "fields": ["state"],
+          "values": ["Births"],
+          "as": ["Baseline"]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.Baseline > 0"
+        },
+        {
+          "type": "formula",
+          "expr": "(datum.Births - datum.Baseline) / datum.Baseline",
+          "as": "Change"
+        },
+        {
+          "type": "formula",
+          "expr": "replace(datum.state, 'W.P. ', '')",
+          "as": "StateLabel"
+        }
+      ]
+    },
+    {
+      "name": "crossings",
+      "source": "series",
+      "transform": [
+        {
+          "type": "window",
+          "groupby": ["state"],
+          "sort": {
+            "field": "Year",
+            "order": "ascending"
+          },
+          "ops": ["lag", "lag"],
+          "fields": ["Year", "Change"],
+          "as": ["PreviousYear", "PreviousChange"]
+        },
+        {
+          "type": "filter",
+          "expr": "isValid(datum.PreviousChange) && datum.PreviousChange * datum.Change < 0"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.PreviousYear + (datum.Year - datum.PreviousYear) * (-datum.PreviousChange) / (datum.Change - datum.PreviousChange)",
+          "as": "Year"
+        },
+        {
+          "type": "formula",
+          "expr": "0",
+          "as": "Change"
+        }
+      ]
+    },
+    {
+      "name": "plotSeries",
+      "source": ["series", "crossings"]
+    },
+    {
+      "name": "bands",
+      "source": "plotSeries",
+      "transform": [
+        {
+          "type": "formula",
+          "expr": "sequence(0, 4)",
+          "as": "BandIndices"
+        },
+        {
+          "type": "flatten",
+          "fields": ["BandIndices"],
+          "as": ["BandIndex"]
+        },
+        {
+          "type": "formula",
+          "expr": "clamp(datum.Change / 0.1 - datum.BandIndex, 0, 1)",
+          "as": "PositiveBand"
+        },
+        {
+          "type": "formula",
+          "expr": "clamp(-datum.Change / 0.1 - datum.BandIndex, 0, 1)",
+          "as": "NegativeBand"
+        },
+        {
+          "type": "formula",
+          "expr": "datum.BandIndex + 1",
+          "as": "PositiveKey"
+        },
+        {
+          "type": "formula",
+          "expr": "-datum.BandIndex - 1",
+          "as": "NegativeKey"
+        },
+        {
+          "type": "collect",
+          "sort": {
+            "field": ["state", "BandIndex", "Year"],
+            "order": ["ascending", "ascending", "ascending"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "latest",
+      "source": "series",
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.Year === 2024"
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "linear",
+      "domain": [2017, 2024],
+      "range": [
+        150,
+        {"signal": "width - 90"}
+      ],
+      "zero": false,
+      "nice": false
+    },
+    {
+      "name": "stateY",
+      "type": "band",
+      "domain": [
+        "Malaysia",
+        "Johor",
+        "Kedah",
+        "Kelantan",
+        "Melaka",
+        "Negeri Sembilan",
+        "Pahang",
+        "Perak",
+        "Perlis",
+        "Pulau Pinang",
+        "Sabah",
+        "Sarawak",
+        "Selangor",
+        "Terengganu",
+        "W.P. Kuala Lumpur",
+        "W.P. Labuan",
+        "W.P. Putrajaya"
+      ],
+      "range": [
+        0,
+        {"signal": "height - 45"}
+      ],
+      "paddingInner": 0.24,
+      "paddingOuter": 0.1
+    },
+    {
+      "name": "horizonColour",
+      "type": "ordinal",
+      "domain": [-1, -2, -3, -4, 1, 2, 3, 4],
+      "range": [
+        "#F4C2C7",
+        "#DF8993",
+        "#C94C5C",
+        "#B2182B",
+        "#C6DBEF",
+        "#8AB6DA",
+        "#4F8FC0",
+        "#2166AC"
+      ]
+    }
+  ],
+  "axes": [
+    {
+      "orient": "bottom",
+      "scale": "x",
+      "offset": -25,
+      "title": "Year",
+      "format": "d",
+      "values": [
+        2017, 2018, 2019, 2020,
+        2021, 2022, 2023, 2024
+      ],
+      "grid": false,
+      "domain": false,
+      "labelPadding": 7
+    }
+  ],
+  "legends": [
+    {
+      "fill": "horizonColour",
+      "title": "Change from each location’s 2017 birth count",
+      "orient": "bottom",
+      "direction": "horizontal",
+      "columns": 4,
+      "columnPadding": 18,
+      "symbolType": "square",
+      "symbolSize": 120,
+      "labelFontSize": 12,
+      "titleFontSize": 13,
+      "encode": {
+        "labels": {
+          "update": {
+            "text": {
+              "signal": "(datum.value < 0 ? 'Decrease ' : 'Increase ') + (abs(datum.value) - 1) * 10 + '–' + abs(datum.value) * 10 + '%'"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "marks": [
+    {
+      "type": "text",
+      "interactive": false,
+      "encode": {
+        "update": {
+          "x": {"value": 150},
+          "y": {"value": -26},
+          "text": {
+            "value": "Every state recorded fewer births in 2024 than 2017."
+          },
+          "fontSize": {"value": 13},
+          "fontWeight": {"value": "bold"},
+          "fill": {"value": "#263238"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "encode": {
+        "update": {
+          "x": {"signal": "width - 80"},
+          "y": {"value": -9},
+          "text": {"value": "2024 change"},
+          "fontSize": {"value": 12},
+          "align": {"value": "left"},
+          "fill": {"value": "#526779"}
+        }
+      }
+    },
+    {
+      "type": "group",
+      "from": {
+        "facet": {
+          "name": "rowBands",
+          "data": "bands",
+          "groupby": ["state"]
+        }
+      },
+      "encode": {
+        "update": {
+          "x": {"value": 0},
+          "y": {
+            "scale": "stateY",
+            "field": "state"
+          },
+          "width": {"signal": "width"},
+          "height": {
+            "signal": "bandwidth('stateY')"
+          }
+        }
+      },
+      "marks": [
+        {
+          "type": "rect",
+          "interactive": false,
+          "encode": {
+            "update": {
+              "x": {"value": 150},
+              "x2": {"signal": "width - 90"},
+              "y": {"value": 0},
+              "height": {
+                "signal": "bandwidth('stateY')"
+              },
+              "fill": {"value": "#FFFFFF"}
+            }
+          }
+        },
+        {
+          "type": "group",
+          "from": {
+            "facet": {
+              "name": "bandPoints",
+              "data": "rowBands",
+              "groupby": ["BandIndex"]
+            }
+          },
+          "sort": {
+            "field": "datum.BandIndex"
+          },
+          "marks": [
+            {
+              "type": "area",
+              "interactive": false,
+              "from": {"data": "bandPoints"},
+              "sort": {
+                "field": "datum.Year"
+              },
+              "encode": {
+                "update": {
+                  "x": {
+                    "scale": "x",
+                    "field": "Year"
+                  },
+                  "y": {
+                    "signal": "bandwidth('stateY') * (1 - datum.PositiveBand)"
+                  },
+                  "y2": {
+                    "signal": "bandwidth('stateY')"
+                  },
+                  "fill": {
+                    "scale": "horizonColour",
+                    "field": "PositiveKey"
+                  },
+                  "interpolate": {
+                    "value": "linear"
+                  }
+                }
+              }
+            },
+            {
+              "type": "area",
+              "interactive": false,
+              "from": {"data": "bandPoints"},
+              "sort": {
+                "field": "datum.Year"
+              },
+              "encode": {
+                "update": {
+                  "x": {
+                    "scale": "x",
+                    "field": "Year"
+                  },
+                  "y": {
+                    "signal": "bandwidth('stateY') * (1 - datum.NegativeBand)"
+                  },
+                  "y2": {
+                    "signal": "bandwidth('stateY')"
+                  },
+                  "fill": {
+                    "scale": "horizonColour",
+                    "field": "NegativeKey"
+                  },
+                  "interpolate": {
+                    "value": "linear"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "rect",
+          "interactive": false,
+          "encode": {
+            "update": {
+              "x": {"value": 150},
+              "x2": {"signal": "width - 90"},
+              "y": {"value": 0},
+              "height": {
+                "signal": "bandwidth('stateY')"
+              },
+              "fill": {"value": "transparent"},
+              "stroke": {
+                "signal": "datum.state === selectedState ? '#62558A' : '#D3DFE8'"
+              },
+              "strokeWidth": {
+                "signal": "datum.state === selectedState ? 2 : 0.5"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "rect",
+      "from": {"data": "series"},
+      "encode": {
+        "update": {
+          "x": {
+            "signal": "max(150, scale('x', datum.Year - 0.5))"
+          },
+          "x2": {
+            "signal": "min(width - 90, scale('x', datum.Year + 0.5))"
+          },
+          "y": {
+            "scale": "stateY",
+            "field": "state"
+          },
+          "height": {
+            "signal": "bandwidth('stateY')"
+          },
+          "fill": {"value": "#FFFFFF"},
+          "fillOpacity": {"value": 0},
+          "tooltip": {
+            "signal": "{'Location': datum.StateLabel, 'Year': format(datum.Year, 'd'), 'Registered births': format(datum.Births, ',.0f'), 'Births in 2017': format(datum.Baseline, ',.0f'), 'Change from 2017': format(datum.Change, '+.1%')}"
+          }
+        },
+        "hover": {
+          "fillOpacity": {"value": 0.15}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "latest"},
+      "encode": {
+        "update": {
+          "x": {"value": 140},
+          "y": {
+            "signal": "scale('stateY', datum.state) + bandwidth('stateY') / 2"
+          },
+          "text": {"field": "StateLabel"},
+          "align": {"value": "right"},
+          "baseline": {"value": "middle"},
+          "fontSize": {"value": 13},
+          "fontWeight": {
+            "signal": "datum.state === selectedState || datum.state === 'Malaysia' ? 'bold' : 'normal'"
+          },
+          "fill": {"value": "#263238"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "interactive": false,
+      "from": {"data": "latest"},
+      "encode": {
+        "update": {
+          "x": {"signal": "width - 80"},
+          "y": {
+            "signal": "scale('stateY', datum.state) + bandwidth('stateY') / 2"
+          },
+          "text": {
+            "signal": "format(datum.Change, '+.1%')"
+          },
+          "align": {"value": "left"},
+          "baseline": {"value": "middle"},
+          "fontSize": {"value": 13},
+          "fontWeight": {"value": "bold"},
+          "fill": {
+            "signal": "datum.Change < 0 ? '#B2182B' : '#2166AC'"
+          }
         }
       }
     }
   ],
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
-    "axis": {"labelFontSize": 12, "titleFontSize": 13, "domain": false, "tickColor": "#CCCCCC"}
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 13,
+      "tickColor": "#CCCCCC"
+    },
+    "legend": {
+      "labelFont": "Arial",
+      "titleFont": "Arial"
+    }
   }
 }
