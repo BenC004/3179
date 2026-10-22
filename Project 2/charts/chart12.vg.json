@@ -271,7 +271,7 @@
       "name": "stageColour",
       "type": "ordinal",
       "domain": ["primary", "secondary"],
-      "range": ["#4E79A7", "#F28E2B"]
+      "range": ["#54278F", "#F28E2B"]
     }
   ],
   "axes": [

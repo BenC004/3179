@@ -1,90 +1,287 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+
   "title": {
     "text": "When did school enrolment rise or fall?",
     "subtitle": [
       "Annual percentage change in government primary and secondary enrolment, 2018 - 2025",
-      "Each year compares with the previous year. Colour scale capped at ±5%."
+      "Each year compares with the previous year. Colours capped at ±5%; labels show actual changes."
     ],
     "anchor": "start",
     "fontSize": 22,
     "subtitleFontSize": 13
   },
+
   "width": 800,
   "height": 500,
-  "data": {"url": "../source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+
+  "data": {
+    "url": "../source1/enrolment_school_district.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "students": "number"
+      }
+    }
+  },
+
   "transform": [
-    {"filter": "datum.state !== 'Malaysia'"},
-    {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
-    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year >= 2017 && datum.Year <= 2025"},
     {
-      "aggregate": [{"op": "sum", "field": "students", "as": "Students"}],
-      "groupby": ["state", "Year"]
+      "filter": "datum.state !== 'Malaysia'"
+    },
+    {
+      "filter": "datum.district === 'All Districts' && datum.sex === 'both'"
+    },
+    {
+      "filter": "datum.stage === 'primary' || datum.stage === 'secondary'"
+    },
+    {
+      "calculate": "toNumber(substring(datum.date, 0, 4))",
+      "as": "Year"
+    },
+    {
+      "filter": "datum.Year >= 2017 && datum.Year <= 2025"
+    },
+    {
+      "aggregate": [
+        {
+          "op": "sum",
+          "field": "students",
+          "as": "Students"
+        }
+      ],
+      "groupby": [
+        "state",
+        "Year"
+      ]
     },
     {
       "window": [
-        {"op": "lag", "field": "Students", "as": "Previous Students"},
-        {"op": "lag", "field": "Year", "as": "Previous Year"}
+        {
+          "op": "lag",
+          "field": "Students",
+          "as": "Previous Students"
+        },
+        {
+          "op": "lag",
+          "field": "Year",
+          "as": "Previous Year"
+        }
       ],
-      "sort": [{"field": "Year", "order": "ascending"}],
-      "groupby": ["state"]
+      "sort": [
+        {
+          "field": "Year",
+          "order": "ascending"
+        }
+      ],
+      "groupby": [
+        "state"
+      ]
     },
     {
       "calculate": "datum['Previous Students'] > 0 && datum['Previous Year'] === datum.Year - 1 ? (datum.Students - datum['Previous Students']) / datum['Previous Students'] : null",
       "as": "Annual Change"
     },
-    {"calculate": "datum.Students - datum['Previous Students']", "as": "Student Change"},
-    {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
-    {"filter": "datum.Year >= 2018 && isValid(datum['Annual Change'])"}
+    {
+      "calculate": "datum.Students - datum['Previous Students']",
+      "as": "Student Change"
+    },
+    {
+      "calculate": "replace(datum.state, 'W.P. ', '')",
+      "as": "State Label"
+    },
+    {
+      "filter": "datum.Year >= 2018 && isValid(datum['Annual Change'])"
+    },
+    {
+      "joinaggregate": [
+        {
+          "op": "max",
+          "field": "Annual Change",
+          "as": "Largest Increase"
+        }
+      ]
+    }
   ],
-  "mark": {"type": "rect", "stroke": "#FFFFFF", "strokeWidth": 0.5},
+
   "encoding": {
     "x": {
-      "field": "Year", "type": "ordinal",
+      "field": "Year",
+      "type": "ordinal",
       "sort": "ascending",
-      "axis": {"title": null, "orient": "top",
-        "labelAngle": 0, "labelPadding": 8,
-        "ticks": false, "domain": false
+      "axis": {
+        "title": null,
+        "orient": "top",
+        "labelAngle": 0,
+        "labelPadding": 8,
+        "ticks": false,
+        "domain": false
       }
     },
+
     "y": {
-      "field": "State Label", "type": "nominal",
+      "field": "State Label",
+      "type": "nominal",
       "sort": [
-        "Johor", "Kedah", "Kelantan", "Kuala Lumpur",
-        "Labuan", "Melaka", "Negeri Sembilan", "Pahang",
-        "Perak", "Perlis", "Pulau Pinang", "Putrajaya",
-        "Sabah", "Sarawak", "Selangor", "Terengganu"
+        "Johor",
+        "Kedah",
+        "Kelantan",
+        "Kuala Lumpur",
+        "Labuan",
+        "Melaka",
+        "Negeri Sembilan",
+        "Pahang",
+        "Perak",
+        "Perlis",
+        "Pulau Pinang",
+        "Putrajaya",
+        "Sabah",
+        "Sarawak",
+        "Selangor",
+        "Terengganu"
       ],
-      "axis": { "title": null,
-        "labelPadding": 8, "labelLimit": 150,
-        "ticks": false, "domain": false
+      "axis": {
+        "title": null,
+        "labelPadding": 8,
+        "labelLimit": 150,
+        "ticks": false,
+        "domain": false
       }
     },
-    "color": {
-      "field": "Annual Change", "type": "quantitative",
-      "scale": {"domain": [-0.05, 0, 0.05], "range": ["#A64B5B", "#F2F2F2", "#76B7B2"], "clamp": true},
-      "legend": { "title": "Annual enrolment change", "orient": "bottom",
-        "direction": "horizontal", "format": ".0%",
-        "values": [-0.05, -0.025, 0, 0.025, 0.05],
-        "gradientLength": 250
-      }
-    },
+
     "tooltip": [
-      {"field": "State Label", "type": "nominal", "title": "State"},
-      {"field": "Year", "type": "quantitative", "title": "Year", "format": "d"},
-      {"field": "Previous Year", "type": "quantitative", "title": "Compared with", "format": "d"},
-      {"field": "Previous Students", "type": "quantitative", "title": "Previous year's students", "format": ",.0f"},
-      {"field": "Students", "type": "quantitative", "title": "Current year's students", "format": ",.0f"},
-      {"field": "Student Change", "type": "quantitative", "title": "Change in students", "format": "+,.0f"},
-      {"field": "Annual Change", "type": "quantitative", "title": "Annual percentage change", "format": "+.1%"}
+      {
+        "field": "State Label",
+        "type": "nominal",
+        "title": "State"
+      },
+      {
+        "field": "Year",
+        "type": "quantitative",
+        "title": "Year",
+        "format": "d"
+      },
+      {
+        "field": "Previous Year",
+        "type": "quantitative",
+        "title": "Compared with",
+        "format": "d"
+      },
+      {
+        "field": "Previous Students",
+        "type": "quantitative",
+        "title": "Previous year's students",
+        "format": ",.0f"
+      },
+      {
+        "field": "Students",
+        "type": "quantitative",
+        "title": "Current year's students",
+        "format": ",.0f"
+      },
+      {
+        "field": "Student Change",
+        "type": "quantitative",
+        "title": "Change in students",
+        "format": "+,.0f"
+      },
+      {
+        "field": "Annual Change",
+        "type": "quantitative",
+        "title": "Annual percentage change",
+        "format": "+.1%"
+      }
     ]
   },
+
+  "layer": [
+    {
+      "mark": {
+        "type": "rect",
+        "stroke": "#FFFFFF",
+        "strokeWidth": 0.5
+      },
+
+      "encoding": {
+        "color": {
+          "field": "Annual Change",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              -0.05,
+              0,
+              0.05
+            ],
+            "range": [
+              "#B2182B",
+              "#F2F2F2",
+              "#2166AC"
+            ],
+            "clamp": true
+          },
+          "legend": {
+            "title": "Annual enrolment change",
+            "orient": "bottom",
+            "direction": "horizontal",
+            "format": ".0%",
+            "values": [
+              -0.05,
+              -0.025,
+              0,
+              0.025,
+              0.05
+            ],
+            "gradientLength": 250
+          }
+        }
+      }
+    },
+
+    {
+      "transform": [
+        {
+          "filter": "(datum.state === 'Perlis' && datum.Year === 2018) || (datum['Annual Change'] === datum['Largest Increase'] && datum['Annual Change'] > 0)"
+        }
+      ],
+
+      "mark": {
+        "type": "text",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "align": "center",
+        "baseline": "middle"
+      },
+
+      "encoding": {
+        "text": {
+          "field": "Annual Change",
+          "type": "quantitative",
+          "format": "+.1%"
+        },
+
+        "color": {
+          "condition": {
+            "test": "abs(datum['Annual Change']) >= 0.035",
+            "value": "#FFFFFF"
+          },
+          "value": "#263238"
+        }
+      }
+    }
+  ],
+
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
-    "axis": {"labelFontSize": 12, "grid": false},
-    "legend": {"labelFontSize": 12, "titleFontSize": 13}
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "grid": false
+    },
+    "legend": {
+      "labelFontSize": 12,
+      "titleFontSize": 13
+    }
   }
 }

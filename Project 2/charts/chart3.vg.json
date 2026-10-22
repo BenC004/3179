@@ -79,7 +79,7 @@
         "shape": {"field": "Boundary", "type": "geojson"},
         "color": {
           "field": "Growth", "type": "quantitative",
-          "scale": {"domain": [-0.2, 0, 0.2], "range": ["#A64B5B", "#F2F2F2", "#76B7B2"], "clamp": true},
+          "scale": {"domain": [-0.2, 0, 0.2], "range": ["#B2182B", "#F2F2F2", "#2166AC"], "clamp": true},
           "legend": {
             "title": "Enrolment growth",
             "orient": "bottom",

@@ -70,7 +70,7 @@
         "y2": {"field": "Cumulative"},
         "color": {
           "field": "Direction", "type": "nominal",
-          "scale": {"domain": ["Decrease", "Increase"], "range": ["#A64B5B", "#76B7B2"]},
+          "scale": {"domain": ["Decrease", "Increase"], "range": ["#B2182B", "#2166AC"]},
           "legend": {"title": "Change direction", "orient": "right"}
         },
         "tooltip": [

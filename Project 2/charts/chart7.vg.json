@@ -189,7 +189,7 @@
             "update": {
               "x": {"scale": "x", "field": "Measure"},
               "y": {"scale": "growth", "field": "Growth"},
-              "stroke": {"signal": "datum.state === selectedState || datum.state === hoveredState || selectedState === 'All states' ? '#756BB1' : '#BBBBBB'"},
+              "stroke": {"signal": "datum.state === selectedState || datum.state === hoveredState || selectedState === 'All states' ? '#475569' : '#BBBBBB'"},
               "strokeWidth": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 3 : 1.5"},
               "strokeOpacity": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 1 : selectedState === 'All states' ? 0.45 : 0.3"},
               "tooltip": {
@@ -209,7 +209,7 @@
           "x": {"scale": "x", "field": "Measure"},
           "y": {"scale": "growth", "field": "Growth"},
           "size": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 90 : 35"},
-          "fill": {"signal": "datum.state === selectedState || datum.state === hoveredState || selectedState === 'All states' ? '#756BB1' : '#BBBBBB'"},
+          "fill": {"signal": "datum.state === selectedState || datum.state === hoveredState || selectedState === 'All states' ? '#475569' : '#BBBBBB'"},
           "fillOpacity": {"signal": "datum.state === selectedState || datum.state === hoveredState ? 1 : 0.35"},
           "stroke": {"value": "#FFFFFF"},
           "strokeWidth": {"value": 0.5},

@@ -1,92 +1,317 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+
   "title": {
     "text": "Where are Malaysia's students concentrated?",
     "subtitle": [
-      "Government primary and secondary enrolment by state, 2025",
-      "Larger circles indicate higher enrolment."
+      "Government-school enrolment by state, 2025.",
+      "Circle area represents student numbers.",
+      "Choose a school stage; circle sizes use the same scale."
     ],
     "anchor": "start",
     "fontSize": 22,
     "subtitleFontSize": 13
   },
+
   "width": 800,
   "height": 500,
-  "projection": {"type": "mercator"},
+
+  "projection": {
+    "type": "mercator"
+  },
+
+  "params": [
+    {
+      "name": "selectedStage",
+      "value": "combined",
+      "bind": {
+        "input": "select",
+        "name": "School stage: ",
+        "options": [
+          "combined",
+          "primary",
+          "secondary"
+        ],
+        "labels": [
+          "Combined",
+          "Primary",
+          "Secondary"
+        ]
+      }
+    }
+  ],
+
   "layer": [
     {
-      "data": {"url": "../maps/administrative_1_state.geojson", "format": {"type": "json", "property": "features"}},
-      "mark": {"type": "geoshape", "fill": "#EEEEEE", "stroke": "#FFFFFF", "strokeWidth": 1}
+      "data": {
+        "url": "../maps/administrative_1_state.geojson",
+        "format": {
+          "type": "json",
+          "property": "features"
+        }
+      },
+
+      "mark": {
+        "type": "geoshape",
+        "fill": "#E2E8ED",
+        "stroke": "#FFFFFF",
+        "strokeWidth": 1
+      }
     },
+
     {
-      "data": {"url": "../source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+      "data": {
+        "url": "../source1/enrolment_school_district.csv",
+        "format": {
+          "type": "csv",
+          "parse": {
+            "students": "number"
+          }
+        }
+      },
+
       "transform": [
-        {"filter": "datum.state !== 'Malaysia'"},
-        {"filter": "datum.district === 'All Districts' && datum.sex === 'both'"},
-        {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-        {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-        {"filter": "datum.Year === 2025"},
         {
-          "aggregate": [{"op": "sum", "field": "students", "as": "Students"}],
-          "groupby": ["state", "Year"]
+          "filter": "datum.state !== 'Malaysia'"
         },
-        {"joinaggregate": [{"op": "sum", "field": "Students", "as": "National Students"}]},
-        {"calculate": "datum.Students / datum['National Students']", "as": "National Share"},
-        {"calculate": "replace(datum.state, 'W.P. ', '')", "as": "State Label"},
+        {
+          "filter": "datum.district === 'All Districts' && datum.sex === 'both'"
+        },
+        {
+          "filter": "datum.stage === 'primary' || datum.stage === 'secondary'"
+        },
+        {
+          "calculate": "toNumber(substring(datum.date, 0, 4))",
+          "as": "Year"
+        },
+        {
+          "filter": "datum.Year === 2025"
+        },
+        {
+          "filter": "selectedStage === 'combined' || datum.stage === selectedStage"
+        },
+        {
+          "aggregate": [
+            {
+              "op": "sum",
+              "field": "students",
+              "as": "Students"
+            }
+          ],
+          "groupby": [
+            "state",
+            "Year"
+          ]
+        },
+        {
+          "joinaggregate": [
+            {
+              "op": "sum",
+              "field": "Students",
+              "as": "National Students"
+            }
+          ]
+        },
+        {
+          "calculate": "datum.Students / datum['National Students']",
+          "as": "National Share"
+        },
+        {
+          "calculate": "replace(datum.state, 'W.P. ', '')",
+          "as": "State Label"
+        },
+        {
+          "calculate": "selectedStage === 'combined' ? 'Primary and secondary combined' : selectedStage === 'primary' ? 'Primary' : 'Secondary'",
+          "as": "School Stage"
+        },
         {
           "lookup": "state",
           "from": {
             "data": {
               "values": [
-                {"state": "Perlis", "lon": 100.23, "lat": 6.50},
-                {"state": "Kedah", "lon": 100.65, "lat": 5.95},
-                {"state": "Pulau Pinang", "lon": 100.25, "lat": 5.35},
-                {"state": "Perak", "lon": 101.05, "lat": 4.65},
-                {"state": "Kelantan", "lon": 102.15, "lat": 5.35},
-                {"state": "Terengganu", "lon": 103.00, "lat": 4.85},
-                {"state": "Pahang", "lon": 102.50, "lat": 3.70},
-                {"state": "Selangor", "lon": 101.25, "lat": 3.35},
-                {"state": "Negeri Sembilan", "lon": 102.20, "lat": 2.80},
-                {"state": "Melaka", "lon": 102.30, "lat": 2.20},
-                {"state": "Johor", "lon": 103.35, "lat": 1.95},
-                {"state": "Sabah", "lon": 117.00, "lat": 5.30},
-                {"state": "Sarawak", "lon": 113.40, "lat": 2.50},
-                {"state": "W.P. Kuala Lumpur", "lon": 101.69, "lat": 3.14},
-                {"state": "W.P. Putrajaya", "lon": 101.70, "lat": 2.93},
-                {"state": "W.P. Labuan", "lon": 115.24, "lat": 5.30}
+                {
+                  "state": "Perlis",
+                  "lon": 100.23,
+                  "lat": 6.50
+                },
+                {
+                  "state": "Kedah",
+                  "lon": 100.65,
+                  "lat": 5.95
+                },
+                {
+                  "state": "Pulau Pinang",
+                  "lon": 100.25,
+                  "lat": 5.35
+                },
+                {
+                  "state": "Perak",
+                  "lon": 101.05,
+                  "lat": 4.65
+                },
+                {
+                  "state": "Kelantan",
+                  "lon": 102.15,
+                  "lat": 5.35
+                },
+                {
+                  "state": "Terengganu",
+                  "lon": 103.00,
+                  "lat": 4.85
+                },
+                {
+                  "state": "Pahang",
+                  "lon": 102.50,
+                  "lat": 3.70
+                },
+                {
+                  "state": "Selangor",
+                  "lon": 101.25,
+                  "lat": 3.35
+                },
+                {
+                  "state": "Negeri Sembilan",
+                  "lon": 102.20,
+                  "lat": 2.80
+                },
+                {
+                  "state": "Melaka",
+                  "lon": 102.30,
+                  "lat": 2.20
+                },
+                {
+                  "state": "Johor",
+                  "lon": 103.35,
+                  "lat": 1.95
+                },
+                {
+                  "state": "Sabah",
+                  "lon": 117.00,
+                  "lat": 5.30
+                },
+                {
+                  "state": "Sarawak",
+                  "lon": 113.40,
+                  "lat": 2.50
+                },
+                {
+                  "state": "W.P. Kuala Lumpur",
+                  "lon": 101.69,
+                  "lat": 3.14
+                },
+                {
+                  "state": "W.P. Putrajaya",
+                  "lon": 101.70,
+                  "lat": 2.93
+                },
+                {
+                  "state": "W.P. Labuan",
+                  "lon": 115.24,
+                  "lat": 5.30
+                }
               ]
             },
-            "key": "state", "fields": ["lon", "lat"]
+            "key": "state",
+            "fields": [
+              "lon",
+              "lat"
+            ]
           }
         }
       ],
-      "mark": {"type": "circle", "color": "#756BB1", "opacity": 0.7, "stroke": "#4A3F75", "strokeWidth": 1},
+
+      "mark": {
+        "type": "circle",
+        "color": "#008B8B",
+        "opacity": 0.75,
+        "stroke": "#005F60",
+        "strokeWidth": 1
+      },
+
       "encoding": {
-        "longitude": {"field": "lon", "type": "quantitative"},
-        "latitude": {"field": "lat", "type": "quantitative"},
+        "longitude": {
+          "field": "lon",
+          "type": "quantitative"
+        },
+
+        "latitude": {
+          "field": "lat",
+          "type": "quantitative"
+        },
+
         "size": {
-          "field": "Students", "type": "quantitative",
-          "scale": {"type": "linear", "zero": true, "range": [0, 1800]},
+          "field": "Students",
+          "type": "quantitative",
+          "scale": {
+            "type": "linear",
+            "domain": [0, 1000000],
+            "range": [0, 1800],
+            "zero": true,
+            "nice": false
+          },
           "legend": {
             "title": "Number of students",
-            "orient": "right",
-            "format": ",.0f",
-            "values": [50000, 200000, 400000, 600000, 800000]
+            "orient": "bottom",
+            "direction": "horizontal",
+            "columns": 3,
+            "format": "~s",
+            "values": [
+              50000,
+              200000,
+              400000,
+              600000,
+              800000
+            ]
           }
         },
-        "order": {"field": "Students", "sort": "descending"},
+
+        "order": {
+          "field": "Students",
+          "sort": "descending"
+        },
+
         "tooltip": [
-          {"field": "State Label", "type": "nominal", "title": "State"},
-          {"field": "Year", "type": "quantitative", "title": "Year", "format": "d"},
-          {"field": "Students", "type": "quantitative", "title": "Students", "format": ",.0f"},
-          {"field": "National Share", "type": "quantitative", "title": "Share of national enrolment", "format": ".1%"}
+          {
+            "field": "State Label",
+            "type": "nominal",
+            "title": "State"
+          },
+          {
+            "field": "School Stage",
+            "type": "nominal",
+            "title": "School stage"
+          },
+          {
+            "field": "Year",
+            "type": "quantitative",
+            "title": "Year",
+            "format": "d"
+          },
+          {
+            "field": "Students",
+            "type": "quantitative",
+            "title": "Students",
+            "format": ",.0f"
+          },
+          {
+            "field": "National Share",
+            "type": "quantitative",
+            "title": "Share of national enrolment",
+            "format": ".2%"
+          }
         ]
       }
     }
   ],
+
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
-    "legend": {"labelFontSize": 12, "titleFontSize": 13}
+    "view": {
+      "stroke": null
+    },
+    "legend": {
+      "labelFontSize": 12,
+      "titleFontSize": 13
+    }
   }
 }

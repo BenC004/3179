@@ -1,25 +1,30 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v6.json",
+
   "width": 800,
   "height": 520,
   "padding": 25,
+
   "title": {
     "text": "How are schools distributed relative to student numbers?",
     "subtitle": [
-      "Government primary and secondary schools by state, 2025",
-      "State shape area = school count; darker purple = more students per school.",
-      "Shapes are resized and separated; geographic positions are approximate."
+      "Government primary and secondary schools by state, 2025.",
+      "State shape area = school count; darker brown = more students per school.",
+      "Shapes are resized and separated; geographic positions are approximate.",
+      "Grey reference squares show equivalent areas for school counts."
     ],
     "anchor": "start",
     "fontSize": 22,
     "subtitleFontSize": 13
   },
+
   "signals": [
     {
       "name": "pixelsPerSchool",
       "value": 3
     }
   ],
+
   "projections": [
     {
       "name": "outlineProjection",
@@ -30,13 +35,16 @@
       "precision": 0.1
     }
   ],
+
   "data": [
     {
       "name": "schoolTotals",
       "url": "../source1/schools_district.csv",
       "format": {
         "type": "csv",
-        "parse": {"schools": "number"}
+        "parse": {
+          "schools": "number"
+        }
       },
       "transform": [
         {
@@ -56,12 +64,15 @@
         }
       ]
     },
+
     {
       "name": "studentTotals",
       "url": "../source1/enrolment_school_district.csv",
       "format": {
         "type": "csv",
-        "parse": {"students": "number"}
+        "parse": {
+          "students": "number"
+        }
       },
       "transform": [
         {
@@ -81,6 +92,7 @@
         }
       ]
     },
+
     {
       "name": "cartogram",
       "url": "../maps/administrative_1_state.geojson",
@@ -215,7 +227,9 @@
             },
             {
               "force": "collide",
-              "radius": {"expr": "datum.CollisionRadius"},
+              "radius": {
+                "expr": "datum.CollisionRadius"
+              },
               "strength": 1,
               "iterations": 5
             }
@@ -248,6 +262,7 @@
         }
       ]
     },
+
     {
       "name": "internalLabels",
       "source": "cartogram",
@@ -258,6 +273,7 @@
         }
       ]
     },
+
     {
       "name": "externalLabels",
       "source": "cartogram",
@@ -268,14 +284,22 @@
         }
       ]
     },
+
     {
       "name": "regions",
       "values": [
-        {"label": "Peninsular Malaysia", "x": 240},
-        {"label": "East Malaysia", "x": 640}
+        {
+          "label": "Peninsular Malaysia",
+          "x": 240
+        },
+        {
+          "label": "East Malaysia",
+          "x": 640
+        }
       ]
     }
   ],
+
   "scales": [
     {
       "name": "ratioColour",
@@ -284,18 +308,28 @@
         "data": "cartogram",
         "field": "StudentsPerSchool"
       },
-      "range": ["#F2EDF8", "#54278F"],
+      "range": [
+        "#F6E8C3",
+        "#8C510A"
+      ],
       "zero": false,
       "nice": false
     },
+
     {
       "name": "schoolArea",
       "type": "linear",
       "domain": [0, 1000],
-      "range": [0, {"signal": "1000 * pixelsPerSchool"}],
+      "range": [
+        0,
+        {
+          "signal": "1000 * pixelsPerSchool"
+        }
+      ],
       "zero": true
     }
   ],
+
   "legends": [
     {
       "fill": "ratioColour",
@@ -304,125 +338,250 @@
       "direction": "horizontal",
       "gradientLength": 280,
       "format": ",.0f"
+    },
+
+    {
+      "size": "schoolArea",
+      "title": "Schools (equal-area reference squares)",
+      "titleLimit": 320,
+      "orient": "bottom",
+      "direction": "horizontal",
+      "columns": 3,
+      "columnPadding": 20,
+      "values": [100, 500, 1000],
+      "format": ",.0f",
+      "symbolType": "square",
+      "symbolFillColor": "#DDDDDD",
+      "symbolStrokeColor": "#777777"
     }
   ],
+
   "marks": [
     {
       "type": "text",
       "interactive": false,
-      "from": {"data": "regions"},
+      "from": {
+        "data": "regions"
+      },
       "encode": {
         "update": {
-          "x": {"field": "x"},
-          "y": {"value": 15},
-          "text": {"field": "label"},
-          "align": {"value": "center"},
-          "fontSize": {"value": 14},
-          "fontWeight": {"value": "bold"},
-          "fill": {"value": "#555555"}
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "value": 15
+          },
+          "text": {
+            "field": "label"
+          },
+          "align": {
+            "value": "center"
+          },
+          "fontSize": {
+            "value": 14
+          },
+          "fontWeight": {
+            "value": "bold"
+          },
+          "fill": {
+            "value": "#555555"
+          }
         }
       }
     },
+
     {
       "type": "path",
-      "from": {"data": "cartogram"},
+      "from": {
+        "data": "cartogram"
+      },
       "encode": {
         "update": {
-          "path": {"field": "StatePath"},
-          "x": {"field": "DrawX"},
-          "y": {"field": "DrawY"},
-          "scaleX": {"field": "ScaleFactor"},
-          "scaleY": {"field": "ScaleFactor"},
+          "path": {
+            "field": "StatePath"
+          },
+          "x": {
+            "field": "DrawX"
+          },
+          "y": {
+            "field": "DrawY"
+          },
+          "scaleX": {
+            "field": "ScaleFactor"
+          },
+          "scaleY": {
+            "field": "ScaleFactor"
+          },
           "fill": {
             "scale": "ratioColour",
             "field": "StudentsPerSchool"
           },
-          "stroke": {"value": "#777777"},
+          "stroke": {
+            "value": "#777777"
+          },
           "strokeWidth": {
             "signal": "0.7 / datum.ScaleFactor"
           },
-          "strokeJoin": {"value": "round"},
+          "strokeJoin": {
+            "value": "round"
+          },
           "tooltip": {
             "signal": "{'State': datum.State, 'Year': 2025, 'Schools': format(datum.Schools, ',.0f'), 'Students': format(datum.Students, ',.0f'), 'Students per school': format(datum.StudentsPerSchool, ',.1f')}"
           }
         },
         "hover": {
-          "stroke": {"value": "#222222"},
+          "stroke": {
+            "value": "#222222"
+          },
           "strokeWidth": {
             "signal": "2 / datum.ScaleFactor"
           }
         }
       }
     },
+
     {
       "type": "rule",
       "interactive": false,
-      "from": {"data": "externalLabels"},
+      "from": {
+        "data": "externalLabels"
+      },
       "encode": {
         "update": {
-          "x": {"field": "x"},
-          "y": {"field": "y"},
-          "x2": {"field": "LabelX"},
-          "y2": {"field": "LabelY"},
-          "stroke": {"value": "#777777"},
-          "strokeWidth": {"value": 1}
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "x2": {
+            "field": "LabelX"
+          },
+          "y2": {
+            "field": "LabelY"
+          },
+          "stroke": {
+            "value": "#777777"
+          },
+          "strokeWidth": {
+            "value": 1
+          }
         }
       }
     },
+
     {
       "type": "text",
       "interactive": false,
-      "from": {"data": "internalLabels"},
+      "from": {
+        "data": "internalLabels"
+      },
       "encode": {
         "update": {
-          "x": {"field": "x"},
-          "y": {"field": "y"},
-          "text": {"field": "Label"},
-          "align": {"value": "center"},
-          "baseline": {"value": "middle"},
-          "fontSize": {"value": 11},
-          "fontWeight": {"value": "bold"},
-          "fill": {"value": "#FFFFFF"},
-          "stroke": {"value": "#FFFFFF"},
-          "strokeWidth": {"value": 3}
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "text": {
+            "field": "Label"
+          },
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "fontSize": {
+            "value": 11
+          },
+          "fontWeight": {
+            "value": "bold"
+          },
+          "fill": {
+            "value": "#FFFFFF"
+          },
+          "stroke": {
+            "value": "#FFFFFF"
+          },
+          "strokeWidth": {
+            "value": 3
+          }
         }
       }
     },
+
     {
       "type": "text",
       "interactive": false,
-      "from": {"data": "internalLabels"},
+      "from": {
+        "data": "internalLabels"
+      },
       "encode": {
         "update": {
-          "x": {"field": "x"},
-          "y": {"field": "y"},
-          "text": {"field": "Label"},
-          "align": {"value": "center"},
-          "baseline": {"value": "middle"},
-          "fontSize": {"value": 11},
-          "fontWeight": {"value": "bold"},
-          "fill": {"value": "#222222"}
+          "x": {
+            "field": "x"
+          },
+          "y": {
+            "field": "y"
+          },
+          "text": {
+            "field": "Label"
+          },
+          "align": {
+            "value": "center"
+          },
+          "baseline": {
+            "value": "middle"
+          },
+          "fontSize": {
+            "value": 11
+          },
+          "fontWeight": {
+            "value": "bold"
+          },
+          "fill": {
+            "value": "#222222"
+          }
         }
       }
     },
+
     {
       "type": "text",
-      "from": {"data": "externalLabels"},
+      "from": {
+        "data": "externalLabels"
+      },
       "encode": {
         "update": {
-          "x": {"field": "LabelX"},
-          "y": {"field": "LabelY"},
-          "text": {"field": "Label"},
+          "x": {
+            "field": "LabelX"
+          },
+          "y": {
+            "field": "LabelY"
+          },
+          "text": {
+            "field": "Label"
+          },
           "align": {
             "signal": "datum.LabelDirection > 0 ? 'left' : 'right'"
           },
-          "baseline": {"value": "middle"},
+          "baseline": {
+            "value": "middle"
+          },
           "dx": {
             "signal": "datum.LabelDirection * 4"
           },
-          "fontSize": {"value": 11},
-          "fontWeight": {"value": "bold"},
-          "fill": {"value": "#222222"},
+          "fontSize": {
+            "value": 11
+          },
+          "fontWeight": {
+            "value": "bold"
+          },
+          "fill": {
+            "value": "#222222"
+          },
           "tooltip": {
             "signal": "{'State': datum.State, 'Schools': format(datum.Schools, ',.0f'), 'Students': format(datum.Students, ',.0f'), 'Students per school': format(datum.StudentsPerSchool, ',.1f')}"
           }
@@ -430,8 +589,12 @@
       }
     }
   ],
+
   "config": {
     "font": "Arial",
-    "legend": {"labelFontSize": 12, "titleFontSize": 13}
+    "legend": {
+      "labelFontSize": 12,
+      "titleFontSize": 13
+    }
   }
 }

@@ -2,18 +2,19 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
 
   "title": {
-  "text": {
-    "expr": "'Who are the students in ' + replace(selectedState, 'W.P. ', '') + '?'"
+    "text": {
+      "expr": "'Who are the students in ' + replace(selectedState, 'W.P. ', '') + '?'"
+    },
+    "subtitle": [
+      "Government primary and secondary enrolment, 2025.",
+      "Each square represents 1%; half a square represents 0.5%.",
+      "Shares rounded to the nearest 0.5 percentage point.",
+      "Blue = boys; pink = girls. Hover for exact values."
+    ],
+    "anchor": "start",
+    "fontSize": 20,
+    "subtitleFontSize": 12
   },
-  "subtitle": [
-    "Government primary and secondary enrolment, 2025.",
-    "Each square represents 1% within its school stage.",
-    "Blue = boys; pink = girls. Hover for exact values."
-  ],
-  "anchor": "start",
-  "fontSize": 20,
-  "subtitleFontSize": 12
-},
 
   "data": {
     "url": "../source1/enrolment_school_district.csv",
@@ -102,11 +103,7 @@
           "as": "Students"
         }
       ],
-      "groupby": [
-        "state",
-        "stage",
-        "sex"
-      ]
+      "groupby": ["state", "stage", "sex"]
     },
     {
       "calculate": "datum.sex === 'male' ? datum.Students : 0",
@@ -125,10 +122,7 @@
           "as": "Boys"
         }
       ],
-      "groupby": [
-        "state",
-        "stage"
-      ]
+      "groupby": ["state", "stage"]
     },
     {
       "filter": "datum.TotalStudents > 0"
@@ -146,6 +140,14 @@
       "as": "GirlsShare"
     },
     {
+      "calculate": "round(datum.BoysShare * 200) / 2",
+      "as": "BoysPercentRounded"
+    },
+    {
+      "calculate": "100 - datum.BoysPercentRounded",
+      "as": "GirlsPercentRounded"
+    },
+    {
       "calculate": "datum.stage === 'primary' ? 'Primary' : 'Secondary'",
       "as": "SchoolStage"
     },
@@ -154,16 +156,16 @@
       "as": "Location"
     },
     {
+      "calculate": "datum.SchoolStage + ' | Boys ' + format(datum.BoysPercentRounded, '.1f') + '% · Girls ' + format(datum.GirlsPercentRounded, '.1f') + '%'",
+      "as": "PanelTitle"
+    },
+    {
       "calculate": "sequence(0, 100)",
       "as": "Cells"
     },
     {
-      "flatten": [
-        "Cells"
-      ],
-      "as": [
-        "Cell"
-      ]
+      "flatten": ["Cells"],
+      "as": ["Cell"]
     },
     {
       "calculate": "datum.Cell % 10",
@@ -174,18 +176,12 @@
       "as": "Row"
     },
     {
-      "calculate": "clamp(datum.BoysShare * 100 - datum.Cell, 0, 1)",
+      "calculate": "clamp(datum.BoysPercentRounded - datum.Cell, 0, 1)",
       "as": "BoysFraction"
     },
     {
-      "fold": [
-        "Boys",
-        "Girls"
-      ],
-      "as": [
-        "Sex",
-        "GroupStudents"
-      ]
+      "fold": ["Boys", "Girls"],
+      "as": ["Sex", "GroupStudents"]
     },
     {
       "calculate": "datum.Sex === 'Boys' ? datum.BoysShare : datum.GirlsShare",
@@ -202,10 +198,6 @@
     {
       "calculate": "datum.Row + 1",
       "as": "YEnd"
-    },
-    {
-      "calculate": "datum.SchoolStage + ' | Boys ' + format(datum.BoysShare, '.1%') + ' · Girls ' + format(datum.GirlsShare, '.1%')",
-      "as": "PanelTitle"
     },
     {
       "filter": "datum.XEnd > datum.XStart"
@@ -237,7 +229,8 @@
     "mark": {
       "type": "rect",
       "stroke": "#EEF4F8",
-      "strokeWidth": 1.5
+      "strokeWidth": 1.5,
+      "opacity": 1
     },
 
     "encoding": {
@@ -251,9 +244,11 @@
         },
         "axis": null
       },
+
       "x2": {
         "field": "XEnd"
       },
+
       "y": {
         "field": "Row",
         "type": "quantitative",
@@ -265,21 +260,17 @@
         },
         "axis": null
       },
+
       "y2": {
         "field": "YEnd"
       },
+
       "color": {
         "field": "Sex",
         "type": "nominal",
         "scale": {
-          "domain": [
-            "Boys",
-            "Girls"
-          ],
-          "range": [
-            "#4E79A7",
-            "#CC7A91"
-          ]
+          "domain": ["Boys", "Girls"],
+          "range": ["#4E79A7", "#CC7A91"]
         },
         "legend": {
           "title": null,
@@ -287,6 +278,7 @@
           "direction": "horizontal"
         }
       },
+
       "tooltip": [
         {
           "field": "Location",
@@ -312,7 +304,7 @@
         {
           "field": "Share",
           "type": "quantitative",
-          "title": "Share within this stage",
+          "title": "Exact share within this stage",
           "format": ".2%"
         },
         {
