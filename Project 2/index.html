@@ -63,7 +63,7 @@
             while secondary enrolment fell by
             <strong>3.2%</strong>.
             Together, they changed by only
-            <strong>-0.09%</strong>.
+            <strong>−0.09%</strong>.
           </p>
         </div>
 
@@ -198,7 +198,7 @@
             </p>
           </div>
         </div>
-        
+
       </div>
 
       <div class="chart-story">
@@ -225,7 +225,7 @@
         <div class="insight">
           <h4>National context</h4>
           <p>
-            Malaysia's population aged 0 - 4 fell from about
+            Malaysia's population aged 0–4 fell from about
             <strong>2.61 million</strong> in 2017 to
             <strong>2.26 million</strong> in 2025.
             The youngest cohort became smaller even as
@@ -314,7 +314,7 @@
         <p class="source-citation">
           Ministry of Education Malaysia,
           <em>Student Enrolment, Schools and Teachers by District</em>,
-          2017 - 2025.
+          2017–2025.
         </p>
       </div>
 
@@ -323,7 +323,7 @@
         <p class="source-citation">
           Department of Statistics Malaysia (DOSM),
           <em>State Population and Annual Live Births</em>.
-          Population: 2017 and 2025; births: 2017 - 2024.
+          Population: 2017 and 2025; births: 2017–2024.
         </p>
       </div>
 
@@ -336,54 +336,302 @@
 
   </div>
 
-  <script type="text/javascript">
-
+  <script>
     var chartFolder = new URL(
       "charts/",
       window.location.href
     ).href;
 
-    var chartOptions = {
-      loader: {
-        baseURL: chartFolder
-      },
-      actions: false,
-      renderer: "svg",
+    var chartViews = new Map();
 
-      patch: function (spec) {
-        spec.background = null;
-        return spec;
+    // Preserve dynamic titles from the original specifications.
+    function titleSignal(name, value) {
+      if (
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        value.signal
+      ) {
+        return {
+          name: name,
+          update: value.signal
+        };
       }
-    };
 
-    // Standalone charts.
-    var spec1 = chartFolder + "chart1.vg.json";
-    vegaEmbed("#chart1", spec1, chartOptions)
-      .catch(console.error);
+      return {
+        name: name,
+        value: value == null ? "" : value
+      };
+    }
 
-    var spec2 = chartFolder + "chart2.vg.json";
-    vegaEmbed("#chart2", spec2, chartOptions)
-      .catch(console.error);
+    // Display title and subtitle lines safely as HTML text.
+    function showText(element, value) {
+      element.replaceChildren();
 
-    var spec5 = chartFolder + "chart5.vg.json";
-    vegaEmbed("#chart5", spec5, chartOptions)
-      .catch(console.error);
+      var lines = Array.isArray(value) ? value : [value];
 
-    var spec7 = chartFolder + "chart7.vg.json";
-    vegaEmbed("#chart7", spec7, chartOptions)
-      .catch(console.error);
+      lines.forEach(function (line, index) {
+        if (index) {
+          element.appendChild(document.createElement("br"));
+        }
 
-    var spec8 = chartFolder + "chart8.vg.json";
-    vegaEmbed("#chart8", spec8, chartOptions)
-      .catch(console.error);
+        element.appendChild(
+          document.createTextNode(
+            String(line == null ? "" : line)
+          )
+        );
+      });
+    }
 
-    var spec10 = chartFolder + "chart10.vg.json";
-    vegaEmbed("#chart10", spec10, chartOptions)
-      .catch(console.error);
+    // Position Vega-Lite legends below their charts.
+    function moveLegends(node, id) {
+      if (!node || typeof node !== "object") {
+        return;
+      }
 
-    // Load and resize charts for the two-column layout.
-    async function embedCompact(id) {
-      var container = document.querySelector("#chart" + id);
+      if (Array.isArray(node)) {
+        node.forEach(function (item) {
+          moveLegends(item, id);
+        });
+        return;
+      }
+
+      if (
+        node.legend &&
+        typeof node.legend === "object"
+      ) {
+        node.legend.orient = "bottom";
+        node.legend.direction = "horizontal";
+
+        if (id === 4) {
+          node.legend.columns = 3;
+        }
+      }
+
+      Object.values(node).forEach(function (item) {
+        moveLegends(item, id);
+      });
+    }
+
+    // Adjust chart dimensions without stretching SVG text.
+    function sizeChart(spec, id, width) {
+      var paired = [3, 4, 6, 9, 11, 12].includes(id);
+
+      spec.config = spec.config || {};
+      spec.config.font = "Arial";
+
+      spec.config.axis = Object.assign(
+        {},
+        spec.config.axis,
+        {
+          labelFontSize: 12,
+          titleFontSize: 13
+        }
+      );
+
+      spec.config.legend = Object.assign(
+        {},
+        spec.config.legend,
+        {
+          labelFontSize: 12,
+          titleFontSize: 13
+        }
+      );
+
+      spec.padding = 5;
+
+      if (paired && id !== 6) {
+        var allowance =
+          id === 12 ? 150 :
+          id === 11 ? 100 :
+          id === 9 ? 85 : 20;
+
+        spec.width = Math.max(
+          220,
+          Math.floor(width - allowance)
+        );
+
+        spec.height =
+          id === 11 || id === 12 ? 400 : 300;
+
+      } else if (id === 6) {
+        delete spec.width;
+        delete spec.height;
+
+        var square = Math.max(
+          120,
+          Math.floor((width - 50) / 2)
+        );
+
+        spec.spec.width = square;
+        spec.spec.height = square;
+
+      } else if (id === 1) {
+        spec.width = Math.max(
+          300,
+          Math.floor(width - 100)
+        );
+
+        spec.height = 350;
+
+      } else if (id === 5) {
+        spec.width = Math.max(
+          320,
+          Math.floor(width - 145)
+        );
+
+      } else if (id === 7) {
+        spec.width = Math.max(
+          480,
+          Math.floor(width - 35)
+        );
+
+      } else if (id === 8) {
+        spec.spec.width = Math.max(
+          170,
+          Math.floor((width - 130) / 2)
+        );
+
+        spec.spec.height = 350;
+
+        // Resize the pyramid's centre reference line.
+        spec.spec.layer[3].encoding.y2.value = 350;
+
+      } else if (id === 10) {
+        // Enlarge state geometry while retaining readable text.
+        var factor = Math.max(
+          0.6,
+          (width - 45) / 800
+        );
+
+        spec.width = 800 * factor;
+        spec.height = 520 * factor;
+
+        var areaSignal = spec.signals.find(function (signal) {
+          return signal.name === "pixelsPerSchool";
+        });
+
+        areaSignal.value = 3 * factor * factor;
+
+        var cartogram = spec.data.find(function (dataset) {
+          return dataset.name === "cartogram";
+        });
+
+        cartogram.transform.forEach(function (transform) {
+          if (
+            transform.as === "AnchorX" ||
+            transform.as === "AnchorY"
+          ) {
+            transform.expr =
+              "(" + transform.expr + ") * " + factor;
+          }
+        });
+
+        var regions = spec.data.find(function (dataset) {
+          return dataset.name === "regions";
+        });
+
+        regions.values.forEach(function (region) {
+          region.x *= factor;
+        });
+      }
+
+      if (String(spec.$schema).includes("vega-lite")) {
+        moveLegends(spec, id);
+      }
+
+      if (id === 11 && spec.legends) {
+        spec.legends.forEach(function (legend) {
+          legend.orient = "bottom";
+          legend.direction = "horizontal";
+        });
+      }
+    }
+
+    // Align heading areas, chart areas and insight starting points.
+    function alignPairs() {
+      document.querySelectorAll(".chart-row").forEach(
+        function (row) {
+          var headers = Array.from(
+            row.querySelectorAll(".chart-header")
+          );
+
+          var plots = Array.from(
+            row.querySelectorAll(".chart-plot")
+          );
+
+          headers.concat(plots).forEach(function (element) {
+            element.style.minHeight = "";
+          });
+
+          var columns = getComputedStyle(row)
+            .gridTemplateColumns
+            .split(" ");
+
+          if (columns.length < 2) {
+            return;
+          }
+
+          [headers, plots].forEach(function (group) {
+            var height = Math.ceil(
+              Math.max.apply(
+                null,
+                group.map(function (element) {
+                  return element.getBoundingClientRect().height;
+                })
+              )
+            );
+
+            group.forEach(function (element) {
+              element.style.minHeight = height + "px";
+            });
+          });
+        }
+      );
+    }
+
+    async function renderChart(id) {
+      var container = document.getElementById("chart" + id);
+      var previous = chartViews.get(id);
+      var saved = {};
+
+      // Retain dropdown and checkbox values when resizing.
+      if (previous) {
+        [
+          "selectedState",
+          "selectedStage",
+          "showDistricts",
+          "highlightState"
+        ].forEach(function (name) {
+          try {
+            saved[name] = previous.signal(name);
+          } catch (_) {
+            // This chart does not use that signal.
+          }
+        });
+
+        previous.finalize();
+      }
+
+      chartViews.delete(id);
+      container.replaceChildren();
+
+      var header = document.createElement("header");
+      header.className = "chart-header";
+
+      var heading = document.createElement("h3");
+      heading.id = "chart-heading-" + id;
+
+      var subtitle = document.createElement("p");
+      subtitle.className = "chart-description";
+
+      header.append(heading, subtitle);
+
+      var plot = document.createElement("div");
+      plot.className = "chart-plot";
+      plot.setAttribute("aria-labelledby", heading.id);
+
+      container.append(header, plot);
 
       try {
         var response = await fetch(
@@ -396,100 +644,124 @@
 
         var spec = await response.json();
 
-        var availableWidth = Math.min(
-          container.clientWidth,
-          540
-        );
+        sizeChart(spec, id, container.clientWidth);
 
-        // Keep the original title and subtitle from the JSON.
+        var parameters = spec.params || spec.signals || [];
 
-        if (id === 3 || id === 4) {
-          spec.width = Math.max(240, availableWidth - 20);
-          spec.height = 300;
+        parameters.forEach(function (parameter) {
+          if (
+            Object.prototype.hasOwnProperty.call(
+              saved,
+              parameter.name
+            )
+          ) {
+            parameter.value = saved[parameter.name];
+          }
+        });
 
-        } else if (id === 6) {
-          delete spec.width;
-          delete spec.height;
+        var result = await vegaEmbed(plot, spec, {
+          loader: {
+            baseURL: chartFolder
+          },
 
-          var waffleSize = Math.max(
-            120,
-            Math.floor((availableWidth - 40) / 2)
+          actions: false,
+          renderer: "svg",
+
+          patch: function (compiled) {
+            var original = compiled.title || {};
+
+            compiled.signals = compiled.signals || [];
+
+            compiled.signals.push(
+              titleSignal(
+                "dashboardHeading",
+                original.text
+              )
+            );
+
+            compiled.signals.push(
+              titleSignal(
+                "dashboardDescription",
+                original.subtitle
+              )
+            );
+
+            // Show the original title in the HTML header instead.
+            delete compiled.title;
+            compiled.background = null;
+
+            return compiled;
+          }
+        });
+
+        var view = result.view;
+        chartViews.set(id, view);
+
+        function updateHeader() {
+          showText(
+            heading,
+            view.signal("dashboardHeading")
           );
 
-          spec.spec.width = waffleSize;
-          spec.spec.height = waffleSize;
+          showText(
+            subtitle,
+            view.signal("dashboardDescription")
+          );
 
-        } else if (id === 9) {
-          spec.width = Math.max(220, availableWidth - 80);
-          spec.height = 300;
-
-        } else if (id === 11) {
-          spec.width = Math.max(220, availableWidth - 90);
-          spec.height = 400;
-
-        } else if (id === 12) {
-          spec.width = Math.max(200, availableWidth - 140);
-          spec.height = 400;
+          requestAnimationFrame(alignPairs);
         }
 
-        // Move Vega-Lite legends below the charts.
-        function moveLegends(node) {
-          // Recursively traverse the spec object to find and modify legend properties.
-          if (!node || typeof node !== "object") {
-            return;
-          }
-          
-          if (Array.isArray(node)) {
-            node.forEach(moveLegends);
-            return;
-          }
+        view.addSignalListener(
+          "dashboardHeading",
+          updateHeader
+        );
 
-          if (
-            node.legend &&
-            typeof node.legend === "object"
-          ) {
-            // Move the  discovered legend below the chart
-            node.legend.orient = "bottom";
-            node.legend.direction = "horizontal";
+        view.addSignalListener(
+          "dashboardDescription",
+          updateHeader
+        );
 
-            if (id === 4) {
-              node.legend.columns = 2;
-            }
-          }
-
-          Object.values(node).forEach(moveLegends);
-        }
-
-        if (id <= 9) {
-          moveLegends(spec);
-        }
-
-        // Chart 11 uses Vega's top-level legends array.
-        if (id === 11 && spec.legends) {
-          spec.legends.forEach(function (legend) {
-            legend.orient = "bottom";
-            legend.direction = "horizontal";
-          });
-        }
-
-        await vegaEmbed(container, spec, chartOptions);
+        updateHeader();
 
       } catch (error) {
         console.error("Chart " + id + ":", error);
 
-        container.textContent =
+        heading.textContent = "Chart " + id;
+
+        plot.textContent =
           "Chart could not load. Check the browser console.";
       }
     }
 
-// Display the six paired charts.
-embedCompact(3);
-embedCompact(4);
-embedCompact(6);
-embedCompact(9);
-embedCompact(11);
-embedCompact(12);
+    async function renderDashboard() {
+      await Promise.all(
+        Array.from(
+          { length: 12 },
+          function (_, index) {
+            return renderChart(index + 1);
+          }
+        )
+      );
 
+      alignPairs();
+    }
+
+    renderDashboard();
+
+    // Recalculate chart dimensions after the window width changes.
+    var resizeTimer;
+    var previousWidth = window.innerWidth;
+
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+
+      resizeTimer = setTimeout(function () {
+        if (window.innerWidth !== previousWidth) {
+          previousWidth = window.innerWidth;
+          renderDashboard();
+        }
+      }, 300);
+    });
   </script>
 
 </body>
