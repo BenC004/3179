@@ -24,7 +24,7 @@
   --font-body: Arial, Helvetica, sans-serif;
 }
 
-/* Base */
+/* BASE */
 
 * {
   box-sizing: border-box;
@@ -87,7 +87,7 @@ input:focus-visible {
   min-width: 0;
 }
 
-/* Skip link */
+/* SKIP LINK */
 
 .skip-link {
   position: fixed;
@@ -102,7 +102,7 @@ input:focus-visible {
   top: 10px;
 }
 
-/* Navigation */
+/* NAVIGATION */
 
 .story-nav {
   position: sticky;
@@ -147,7 +147,7 @@ input:focus-visible {
   color: var(--accent);
 }
 
-/* Main title */
+/* MAIN TITLE */
 
 .hero {
   max-width: 1440px;
@@ -194,7 +194,7 @@ h1 em {
   line-height: 1.75;
 }
 
-/* State selection */
+/* STATE SELECTION */
 
 .state-picker {
   max-width: 1440px;
@@ -227,6 +227,7 @@ h1 em {
   display: grid;
   grid-template-columns: repeat(17, minmax(0, 1fr));
   gap: 6px;
+
   max-width: 1392px;
   margin: 20px auto 0;
 }
@@ -244,6 +245,7 @@ h1 em {
   border-radius: 3px;
   background: transparent;
   color: var(--ink);
+
   cursor: pointer;
   font-family: var(--font-body);
 }
@@ -254,6 +256,7 @@ h1 em {
   justify-content: center;
 
   min-height: 36px;
+
   font-size: 13px;
   line-height: 1.35;
   text-align: center;
@@ -294,7 +297,7 @@ h1 em {
   font-size: 13px;
 }
 
-/* Page and chapter banners */
+/* PAGE AND CHAPTER BANNERS */
 
 .page {
   max-width: 1440px;
@@ -372,7 +375,7 @@ h2 {
   line-height: 1.65;
 }
 
-/* Story text */
+/* STORY TEXT */
 
 .chapter-body {
   padding: 40px 44px 48px;
@@ -396,8 +399,9 @@ h2 {
   line-height: 1.65;
 }
 
-/* Chart layouts */
+/* CHART LAYOUTS */
 
+/* Wide chart with a separate annotation column. */
 .chart-story {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
@@ -406,6 +410,7 @@ h2 {
   margin: 30px 0;
 }
 
+/* Two equal chart columns. */
 .chart-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -426,6 +431,16 @@ h2 {
 
 .chart-story > .chart,
 .chart-card > .chart {
+  margin: 0;
+}
+
+/* Chart 9 occupies the entire available row. */
+.chart-full {
+  display: block;
+  margin: 30px 0 40px;
+}
+
+.chart-full > .chart {
   margin: 0;
 }
 
@@ -459,6 +474,7 @@ h2 {
   max-width: 100%;
   overflow-x: auto;
   padding-bottom: 4px;
+  text-align: left;
 }
 
 .chart .vega-embed {
@@ -476,23 +492,7 @@ h2 {
   height: auto;
 }
 
-/* Full-width birth comparison */
-
-.births-row {
-  display: block;
-}
-
-.births-row > .chart-card:first-child {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto 40px;
-}
-
-.births-row > .chart-card + .chart-card {
-  margin-top: 40px;
-}
-
-/* Informative annotations */
+/* ANNOTATIONS */
 
 .insight {
   margin: 22px 0 0;
@@ -547,7 +547,7 @@ h2 {
   text-transform: uppercase;
 }
 
-/* Semantic colours */
+/* SEMANTIC COLOURS */
 
 .term {
   font-weight: 700;
@@ -585,7 +585,7 @@ h2 {
   color: var(--ratio-text);
 }
 
-/* Chart controls */
+/* CHART CONTROLS */
 
 .vega-bindings {
   margin-top: 16px;
@@ -611,7 +611,7 @@ h2 {
   color: var(--ink);
 }
 
-/* Sources */
+/* SOURCES */
 
 .footer {
   padding: 40px 44px 24px;
@@ -668,7 +668,7 @@ h2 {
   font-size: 12px;
 }
 
-/* Responsive layouts */
+/* RESPONSIVE LAYOUTS */
 
 @media (max-width: 1250px) {
   .state-flags {
@@ -705,14 +705,10 @@ h2 {
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
   .chart-row {
     grid-template-columns: 1fr;
     gap: 36px;
-  }
-
-  .births-row {
-    display: block;
   }
 
   .chapter-body,
