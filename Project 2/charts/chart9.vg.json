@@ -19,7 +19,7 @@
       "value": "Malaysia",
       "bind": {
         "input": "select",
-        "name": "Selected location: ",
+        "name": "Selected state: ",
         "options": [
           "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
           "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak",
@@ -72,17 +72,43 @@
     ]
   },
   "layer": [
-    {"mark": {"type": "line", "strokeWidth": 3, "color": "#756BB1"}},
-    {"mark": {"type": "point", "filled": true, "size": 55, "color": "#756BB1"}},
+    {
+      "mark": {
+        "type": "line",
+        "strokeWidth": 3,
+        "color": "#237A57"
+      }
+    },
+    {
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 55,
+        "opacity": 1,
+        "color": "#237A57"
+      }
+    },
     {
       "transform": [
         {"filter": "datum.Year === 2024"}
       ],
       "mark": {
-        "type": "text", "align": "right", "dx": -8, "dy": -15,
-        "fontSize": 13, "fontWeight": "bold","color": "#54278F"
+        "type": "text",
+        "align": "right",
+        "baseline": "top",
+        "dx": -8,
+        "dy": 18,
+        "fontSize": 13,
+        "fontWeight": "bold",
+        "color": "#237A57"
       },
-      "encoding": {"text": {"field": "Births", "type": "quantitative", "format": ",.0f"}}
+      "encoding": {
+        "text": {
+          "field": "Births",
+          "type": "quantitative",
+          "format": ",.0f"
+        }
+      }
     }
   ],
   "config": {
