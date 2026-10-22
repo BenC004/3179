@@ -1,18 +1,30 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+
   "title": {
-    "text": {"expr": "'Who are the students in ' + replace(selectedState, 'W.P. ', '') + '?'"},
-    "subtitle": [
-      "Government primary and secondary school enrolment, 2025",
-      "Column width shows stage share; section height shows male/female share within that stage."
-    ],
-    "anchor": "start",
-    "fontSize": 22,
-    "subtitleFontSize": 13
+  "text": {
+    "expr": "'Who are the students in ' + replace(selectedState, 'W.P. ', '') + '?'"
   },
-  "width": 800,
-  "height": 500,
-  "data": {"url": "../source1/enrolment_school_district.csv", "format": {"type": "csv", "parse": {"students": "number"}}},
+  "subtitle": [
+    "Government primary and secondary enrolment, 2025.",
+    "Each square represents 1% within its school stage.",
+    "Blue = boys; pink = girls. Hover for exact values."
+  ],
+  "anchor": "start",
+  "fontSize": 20,
+  "subtitleFontSize": 12
+},
+
+  "data": {
+    "url": "../source1/enrolment_school_district.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "students": "number"
+      }
+    }
+  },
+
   "params": [
     {
       "name": "selectedState",
@@ -21,119 +33,312 @@
         "input": "select",
         "name": "Selected state: ",
         "options": [
-          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
-          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor", 
-          "Terengganu", "W.P. Kuala Lumpur", "W.P. Labuan", "W.P. Putrajaya"
+          "Malaysia",
+          "Johor",
+          "Kedah",
+          "Kelantan",
+          "Melaka",
+          "Negeri Sembilan",
+          "Pahang",
+          "Perak",
+          "Perlis",
+          "Pulau Pinang",
+          "Sabah",
+          "Sarawak",
+          "Selangor",
+          "Terengganu",
+          "W.P. Kuala Lumpur",
+          "W.P. Labuan",
+          "W.P. Putrajaya"
         ],
         "labels": [
-          "Malaysia", "Johor", "Kedah", "Kelantan", "Melaka", "Negeri Sembilan",
-          "Pahang", "Perak", "Perlis", "Pulau Pinang", "Sabah", "Sarawak", "Selangor", 
-          "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
+          "Malaysia",
+          "Johor",
+          "Kedah",
+          "Kelantan",
+          "Melaka",
+          "Negeri Sembilan",
+          "Pahang",
+          "Perak",
+          "Perlis",
+          "Pulau Pinang",
+          "Sabah",
+          "Sarawak",
+          "Selangor",
+          "Terengganu",
+          "Kuala Lumpur",
+          "Labuan",
+          "Putrajaya"
         ]
       }
     }
   ],
+
   "transform": [
-    {"filter": "datum.state === selectedState"},
-    {"filter": "datum.district === 'All Districts'"},
-    {"filter": "datum.sex === 'male' || datum.sex === 'female'"},
-    {"filter": "datum.stage === 'primary' || datum.stage === 'secondary'"},
-    {"calculate": "toNumber(substring(datum.date, 0, 4))", "as": "Year"},
-    {"filter": "datum.Year === 2025"},
     {
-      "aggregate": [{"op": "sum", "field": "students", "as": "Students"}],
-      "groupby": ["state", "stage", "sex"]
+      "filter": "datum.state === selectedState"
     },
     {
-      "joinaggregate": [{"op": "sum", "field": "Students", "as": "Stage Students"}],
-      "groupby": ["stage"]
+      "filter": "datum.district === 'All Districts'"
     },
-    {"calculate": "datum.stage === 'primary' ? datum.Students : 0", "as": "Primary Students"},
     {
-      "joinaggregate": [
-        {"op": "sum", "field": "Students", "as": "Total Students"},
-        {"op": "sum", "field": "Primary Students", "as": "Primary Total"}
+      "filter": "datum.sex === 'male' || datum.sex === 'female'"
+    },
+    {
+      "filter": "datum.stage === 'primary' || datum.stage === 'secondary'"
+    },
+    {
+      "calculate": "toNumber(substring(datum.date, 0, 4))",
+      "as": "Year"
+    },
+    {
+      "filter": "datum.Year === 2025"
+    },
+    {
+      "aggregate": [
+        {
+          "op": "sum",
+          "field": "students",
+          "as": "Students"
+        }
+      ],
+      "groupby": [
+        "state",
+        "stage",
+        "sex"
       ]
     },
-    {"calculate": "datum.stage === 'primary' ? 'Primary' : 'Secondary'", "as": "School Stage"},
-    {"calculate": "datum.sex === 'male' ? 'Male' : 'Female'", "as": "Sex"},
-    {"calculate": "datum['Stage Students'] / datum['Total Students']", "as": "Stage Share"},
-    {"calculate": "datum.Students / datum['Stage Students']", "as": "Sex Share"},
-    {"calculate": "datum.Students / datum['Total Students']", "as": "Overall Share"},
-    {"calculate": "datum.stage === 'primary' ? 0 : datum['Primary Total'] / datum['Total Students']", "as": "X Start"},
-    {"calculate": "datum.stage === 'primary' ? datum['Primary Total'] / datum['Total Students'] : 1", "as": "X End"},
     {
-      "stack": "Students",
-      "groupby": ["stage"],
-      "sort": [{"field": "sex", "order": "descending"}],
-      "offset": "normalize",
-      "as": ["Y Start", "Y End"]
-    },
-    {"calculate": "(datum['X Start'] + datum['X End']) / 2", "as": "X Centre"},
-    {"calculate": "(datum['Y Start'] + datum['Y End']) / 2", "as": "Y Centre"},
-    {"calculate": "datum.Sex + '\\n' + format(datum['Sex Share'], '.1%')", "as": "Section Label"},
-    {"calculate": "datum['School Stage'] + ' (' + format(datum['Stage Share'], '.1%') + ')'", "as": "Stage Label"}
-  ],
-  "layer": [
-    {
-      "mark": {"type": "rect", "stroke": "#FFFFFF", "strokeWidth": 2},
-      "encoding": {
-        "x": {
-          "field": "X Start", "type": "quantitative",
-          "scale": {"domain": [0, 1], "nice": false},
-          "axis": null
-        },
-        "x2": {"field": "X End"},
-        "y": {
-          "field": "Y Start", "type": "quantitative",
-          "scale": {"domain": [0, 1], "nice": false},
-          "axis": {
-            "title": "Share within school stage",
-            "format": ".0%",
-            "values": [0, 0.25, 0.5, 0.75, 1],
-            "grid": false
-          }
-        },
-        "y2": {"field": "Y End"},
-        "color": {
-          "field": "Sex", "type": "nominal",
-          "scale": {"domain": ["Male", "Female"], "range": ["#4E79A7", "#CC7A91"]},
-          "legend": {"title": "Sex", "orient": "right"}
-        },
-        "tooltip": [
-          {"field": "state", "type": "nominal", "title": "Location"},
-          {"field": "School Stage", "type": "nominal", "title": "School stage"},
-          {"field": "Sex", "type": "nominal", "title": "Sex"},
-          {"field": "Students", "type": "quantitative", "title": "Students", "format": ",.0f"},
-          {"field": "Sex Share", "type": "quantitative", "title": "Share within this stage", "format": ".1%"},
-          {"field": "Stage Share", "type": "quantitative", "title": "Stage share of all students", "format": ".1%"},
-          {"field": "Overall Share", "type": "quantitative", "title": "Section share of all students", "format": ".1%"}
-        ]
-      }
+      "calculate": "datum.sex === 'male' ? datum.Students : 0",
+      "as": "MaleStudents"
     },
     {
-      "mark": {"type": "text", "fontSize": 16, "fontWeight": "bold", "lineBreak": "\n", "lineHeight": 24},
-      "encoding": {
-        "x": {"field": "X Centre", "type": "quantitative", "axis": null},
-        "y": {"field": "Y Centre", "type": "quantitative", "axis": null},
-        "text": {"field": "Section Label", "type": "nominal"},
-        "color": {"value": "#FFFFFF"}
-      }
+      "aggregate": [
+        {
+          "op": "sum",
+          "field": "Students",
+          "as": "TotalStudents"
+        },
+        {
+          "op": "sum",
+          "field": "MaleStudents",
+          "as": "Boys"
+        }
+      ],
+      "groupby": [
+        "state",
+        "stage"
+      ]
     },
     {
-      "transform": [{"filter": "datum.sex === 'male'"}],
-      "mark": {"type": "text", "fontSize": 14, "fontWeight": "bold", "baseline": "top", "color": "#222222"},
-      "encoding": {
-        "x": {"field": "X Centre", "type": "quantitative", "axis": null},
-        "y": {"value": 515},
-        "text": {"field": "Stage Label", "type": "nominal"}
-      }
+      "filter": "datum.TotalStudents > 0"
+    },
+    {
+      "calculate": "datum.TotalStudents - datum.Boys",
+      "as": "Girls"
+    },
+    {
+      "calculate": "datum.Boys / datum.TotalStudents",
+      "as": "BoysShare"
+    },
+    {
+      "calculate": "datum.Girls / datum.TotalStudents",
+      "as": "GirlsShare"
+    },
+    {
+      "calculate": "datum.stage === 'primary' ? 'Primary' : 'Secondary'",
+      "as": "SchoolStage"
+    },
+    {
+      "calculate": "replace(datum.state, 'W.P. ', '')",
+      "as": "Location"
+    },
+    {
+      "calculate": "sequence(0, 100)",
+      "as": "Cells"
+    },
+    {
+      "flatten": [
+        "Cells"
+      ],
+      "as": [
+        "Cell"
+      ]
+    },
+    {
+      "calculate": "datum.Cell % 10",
+      "as": "Column"
+    },
+    {
+      "calculate": "floor(datum.Cell / 10)",
+      "as": "Row"
+    },
+    {
+      "calculate": "clamp(datum.BoysShare * 100 - datum.Cell, 0, 1)",
+      "as": "BoysFraction"
+    },
+    {
+      "fold": [
+        "Boys",
+        "Girls"
+      ],
+      "as": [
+        "Sex",
+        "GroupStudents"
+      ]
+    },
+    {
+      "calculate": "datum.Sex === 'Boys' ? datum.BoysShare : datum.GirlsShare",
+      "as": "Share"
+    },
+    {
+      "calculate": "datum.Sex === 'Boys' ? datum.Column : datum.Column + datum.BoysFraction",
+      "as": "XStart"
+    },
+    {
+      "calculate": "datum.Sex === 'Boys' ? datum.Column + datum.BoysFraction : datum.Column + 1",
+      "as": "XEnd"
+    },
+    {
+      "calculate": "datum.Row + 1",
+      "as": "YEnd"
+    },
+    {
+      "calculate": "datum.SchoolStage + ' | Boys ' + format(datum.BoysShare, '.1%') + ' · Girls ' + format(datum.GirlsShare, '.1%')",
+      "as": "PanelTitle"
+    },
+    {
+      "filter": "datum.XEnd > datum.XStart"
     }
   ],
+
+  "facet": {
+    "column": {
+      "field": "PanelTitle",
+      "type": "nominal",
+      "sort": "ascending",
+      "header": {
+        "title": null,
+        "labelExpr": "split(datum.value, ' | ')",
+        "labelFontSize": 12,
+        "labelFontWeight": "bold",
+        "labelPadding": 12,
+        "labelLineHeight": 18
+      }
+    }
+  },
+
+  "spacing": 24,
+
+  "spec": {
+    "width": 220,
+    "height": 220,
+
+    "mark": {
+      "type": "rect",
+      "stroke": "#EEF4F8",
+      "strokeWidth": 1.5
+    },
+
+    "encoding": {
+      "x": {
+        "field": "XStart",
+        "type": "quantitative",
+        "scale": {
+          "domain": [0, 10],
+          "nice": false,
+          "zero": false
+        },
+        "axis": null
+      },
+      "x2": {
+        "field": "XEnd"
+      },
+      "y": {
+        "field": "Row",
+        "type": "quantitative",
+        "scale": {
+          "domain": [0, 10],
+          "reverse": true,
+          "nice": false,
+          "zero": false
+        },
+        "axis": null
+      },
+      "y2": {
+        "field": "YEnd"
+      },
+      "color": {
+        "field": "Sex",
+        "type": "nominal",
+        "scale": {
+          "domain": [
+            "Boys",
+            "Girls"
+          ],
+          "range": [
+            "#4E79A7",
+            "#CC7A91"
+          ]
+        },
+        "legend": {
+          "title": null,
+          "orient": "bottom",
+          "direction": "horizontal"
+        }
+      },
+      "tooltip": [
+        {
+          "field": "Location",
+          "type": "nominal",
+          "title": "Location"
+        },
+        {
+          "field": "SchoolStage",
+          "type": "nominal",
+          "title": "School stage"
+        },
+        {
+          "field": "Sex",
+          "type": "nominal",
+          "title": "Sex"
+        },
+        {
+          "field": "GroupStudents",
+          "type": "quantitative",
+          "title": "Students in this group",
+          "format": ",.0f"
+        },
+        {
+          "field": "Share",
+          "type": "quantitative",
+          "title": "Share within this stage",
+          "format": ".2%"
+        },
+        {
+          "field": "TotalStudents",
+          "type": "quantitative",
+          "title": "Total students in this stage",
+          "format": ",.0f"
+        }
+      ]
+    }
+  },
+
+  "resolve": {
+    "scale": {
+      "color": "shared"
+    }
+  },
+
   "config": {
     "font": "Arial",
-    "view": {"stroke": null},
-    "axis": {"labelFontSize": 12, "titleFontSize": 13, "domain": false, "tickColor": "#CCCCCC"},
-    "legend": {"labelFontSize": 12, "titleFontSize": 13}
+    "view": {
+      "stroke": null
+    },
+    "legend": {
+      "labelFontSize": 12,
+      "symbolSize": 100
+    }
   }
 }

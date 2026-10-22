@@ -408,11 +408,16 @@
           spec.height = 300;
 
         } else if (id === 6) {
-          spec.width = Math.max(220, availableWidth - 80);
-          spec.height = 300;
+          delete spec.width;
+          delete spec.height;
 
-          // Position the stage labels below the resized mosaic.
-          spec.layer[2].encoding.y.value = 315;
+          var waffleSize = Math.max(
+            120,
+            Math.floor((availableWidth - 40) / 2)
+          );
+
+          spec.spec.width = waffleSize;
+          spec.spec.height = waffleSize;
 
         } else if (id === 9) {
           spec.width = Math.max(220, availableWidth - 80);
