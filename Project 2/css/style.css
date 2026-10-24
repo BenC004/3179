@@ -645,19 +645,6 @@ h2 {
   content: " ";
 }
 
-.flag-credits {
-  margin-top: 22px;
-  font-size: 12px;
-}
-
-.flag-credits p {
-  margin-bottom: 5px;
-}
-
-.flag-credits a {
-  text-underline-offset: 3px;
-}
-
 .author-credit {
   max-width: none;
   margin: 28px 0 0;
