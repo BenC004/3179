@@ -29,6 +29,7 @@
       <a href="#states">State differences</a>
       <a href="#demographics">The next generation</a>
       <a href="#provision">Schools &amp; teachers</a>
+      <a href="#takeaways">Key takeaways</a>
     </div>
   </nav>
 
@@ -249,7 +250,7 @@
               </span>
               <span class="sentence-line">
                 The final national change is
-                <strong class="term term-decrease"> -4,537 students</strong>.
+                <strong class="term term-decrease">-4,537 students</strong>.
               </span>
             </p>
           </aside>
@@ -706,6 +707,104 @@
       </div>
     </section>
 
+    <!-- CONCLUSION: KEY TAKEAWAYS -->
+    <section
+      class="takeaways"
+      id="takeaways"
+      aria-labelledby="takeaways-title"
+    >
+      <p class="eyebrow">Key takeaways</p>
+
+      <h2 id="takeaways-title">
+        A steady total.<br>
+        <em>Different local stories.</em>
+      </h2>
+
+      <p class="takeaways-intro">
+        <span class="sentence-line">
+          National stability hides changes across school stages and states.
+        </span>
+        <span class="sentence-line">
+          These comparisons explain why the local picture differs.
+        </span>
+      </p>
+
+      <div class="takeaway-grid">
+        <article class="takeaway-card">
+          <p class="takeaway-number" aria-hidden="true">01</p>
+
+          <h3>National stability hides differences.</h3>
+
+          <p>
+            <span class="sentence-line">
+              Primary enrolment rose
+              <strong class="term term-primary">2.4%</strong>
+              from 2017 to 2025.
+            </span>
+            <span class="sentence-line">
+              Secondary enrolment fell
+              <strong class="term term-secondary">3.2%</strong>
+              over the same period.
+            </span>
+            <span class="sentence-line">
+              These movements left the national total almost unchanged.
+            </span>
+          </p>
+        </article>
+
+        <article class="takeaway-card">
+          <p class="takeaway-number" aria-hidden="true">02</p>
+
+          <h3>State changes balance out.</h3>
+
+          <p>
+            <span class="sentence-line">
+              Selangor added
+              <strong class="term term-increase">51,626 students</strong>
+              between 2017 and 2025.
+            </span>
+            <span class="sentence-line">
+              Sarawak lost
+              <strong class="term term-decrease">43,214 students</strong>
+              over the same period.
+            </span>
+            <span class="sentence-line">
+              Compare student counts alongside percentage changes.
+            </span>
+          </p>
+        </article>
+
+        <article class="takeaway-card">
+          <p class="takeaway-number" aria-hidden="true">03</p>
+
+          <h3>Local context matters.</h3>
+
+          <p>
+            <span class="sentence-line">
+              Births fell
+              <strong class="term term-decrease">18.4%</strong>
+              between 2017 and 2024.
+            </span>
+            <span class="sentence-line">
+              This provides context for future school-age cohorts.
+            </span>
+            <span class="sentence-line">
+              District staffing ratios also vary within states.
+            </span>
+          </p>
+        </article>
+      </div>
+
+      <p class="takeaways-closing">
+        <span class="sentence-line">
+          School planning needs a local view.
+        </span>
+        <span class="sentence-line">
+          National totals provide a starting point.
+        </span>
+      </p>
+    </section>
+
     <footer class="footer">
       <p class="eyebrow">Sources &amp; scope</p>
 
@@ -794,7 +893,7 @@
       ["W.P. Putrajaya", "Putrajaya", "9/9f", "Flag_of_Putrajaya.svg"]
     ];
 
-    stateFlags.forEach(function(state, index) {
+    stateFlags.forEach(function(state) {
       const [value, label, directory, filename] = state;
 
       const option = document.createElement("option");
@@ -1527,7 +1626,7 @@
 
     document.querySelectorAll(
       ".story-lead, .story-transition, .chapter-intro, " +
-      ".insight p, .chapter-lesson"
+      ".insight p, .chapter-lesson, .takeaway-card p"
     ).forEach(highlightTerms);
 
     const sectionObserver = new IntersectionObserver(
